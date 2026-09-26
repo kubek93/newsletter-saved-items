@@ -8,6 +8,11 @@ const READERS: Partial<Record<Source, Reader>> = {
   x: readX,
 };
 
+/** Whether Items from this Source can be read at all yet. */
+export function hasReader(source: Source): boolean {
+  return source in READERS;
+}
+
 async function loadItem(id: string): Promise<Item> {
   const { data, error } = await supabaseAdmin.from("items").select("*").eq("id", id).single();
   if (error) throw error;
@@ -20,14 +25,16 @@ async function updateItem(id: string, patch: Partial<Item>) {
 }
 
 /**
- * Reads the Item from its Source and writes its Summary. On any failure the Item becomes Failed
- * with the error text and one more attempt counted, so the daily retry can pick it up.
+ * Reads the Item from its Source and writes its Summary, so the Item is done. On any failure the Item
+ * becomes Failed with the error text and one more attempt counted, so the daily retry can pick it up.
+ * A Source without a reader yet is left Pending untouched: missing code is not a failed attempt.
  */
-export async function processItem(id: string): Promise<void> {
+export async function summarizeItem(id: string): Promise<void> {
   const item = await loadItem(id);
+  const reader = READERS[item.source];
+  if (!reader) return;
+
   try {
-    const reader = READERS[item.source];
-    if (!reader) throw new Error(`No reader for source ${item.source}`);
     const summary = await analyze(await reader(item));
     await updateItem(id, { status: "done", error: null, ...summary });
   } catch (cause) {

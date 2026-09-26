@@ -25,8 +25,8 @@ export const readX: Reader = async (item) => {
 
   const { text, author, media } = body.tweet;
   const parts: ContentPart[] = [{ type: "text", text: `@${author.screen_name} (${author.name}):\n${text}` }];
-  for (const entry of media?.all ?? []) {
-    parts.push(entry.type === "photo" ? { type: "image", url: entry.url } : { type: "video", url: entry.url });
+  for (const attachment of media?.all ?? []) {
+    parts.push(attachment.type === "photo" ? { type: "image", url: attachment.url } : { type: "video", url: attachment.url });
   }
   return parts;
 };

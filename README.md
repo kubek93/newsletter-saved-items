@@ -40,6 +40,6 @@ pnpm typecheck
 pnpm lint
 ```
 
-HTTP tests call the route handlers directly with a `Request` and assert on the response and on rows in the local database. Every outbound call (FxTwitter, OpenRouter) is intercepted by `msw` with recorded fixtures under `tests/fixtures`; an unexpected external request fails the test. Pure functions (URL normalisation, Source detection, Digest Day, Category) have table-driven unit tests next to their source.
+HTTP tests call the route handlers directly with a `Request` and assert on the response and on rows in the local database. Every outbound call (FxTwitter, OpenRouter) is intercepted by `msw` with recorded fixtures under `tests/fixtures`; an unexpected external request is rejected instead of reaching the network. Pure functions (URL normalisation, Source detection, Digest Day, Category) have table-driven unit tests next to their source.
 
 After changing a migration: `supabase db reset`.

@@ -1,10 +1,8 @@
-import { digestDayFor } from "@/domain/digest-day";
-import { detectSource } from "@/domain/source";
-import { normalizeUrl } from "@/domain/url";
+import { newLinkItem } from "@/domain/link-item";
 import { afterResponse } from "@/lib/after-response";
 import { isAuthorized } from "@/lib/ingest-auth";
 import { supabaseAdmin } from "@/lib/supabase";
-import { processItem } from "@/processing";
+import { summarizeItem } from "@/summarize";
 
 const UNIQUE_VIOLATION = "23505";
 
@@ -27,29 +25,18 @@ export async function POST(request: Request) {
   if (url === null) {
     return Response.json({ error: "missing url" }, { status: 400 });
   }
-  let normalizedUrl: string;
+  let row: ReturnType<typeof newLinkItem>;
   try {
-    normalizedUrl = normalizeUrl(url);
+    row = newLinkItem(url);
   } catch {
     return Response.json({ error: "invalid url" }, { status: 400 });
   }
 
-  const savedAt = new Date();
-  const inserted = await supabaseAdmin
-    .from("items")
-    .insert({
-      source: detectSource(normalizedUrl),
-      url,
-      normalized_url: normalizedUrl,
-      saved_at: savedAt.toISOString(),
-      digest_day: digestDayFor(savedAt),
-    })
-    .select("id")
-    .single();
+  const inserted = await supabaseAdmin.from("items").insert(row).select("id").single();
 
   if (!inserted.error) {
     const id: string = inserted.data.id;
-    afterResponse(() => processItem(id));
+    afterResponse(() => summarizeItem(id));
     return Response.json({ status: "created", id }, { status: 201 });
   }
   if (inserted.error.code !== UNIQUE_VIOLATION) {
@@ -59,7 +46,7 @@ export async function POST(request: Request) {
   const existing = await supabaseAdmin
     .from("items")
     .select("id")
-    .eq("normalized_url", normalizedUrl)
+    .eq("normalized_url", row.normalized_url)
     .single();
   if (existing.error) throw existing.error;
   return Response.json({ status: "duplicate", id: existing.data.id }, { status: 200 });

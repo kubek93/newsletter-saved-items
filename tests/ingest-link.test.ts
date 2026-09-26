@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { POST } from "@/app/api/ingest/link/route";
-import { allItems, clearItems, getItem, waitUntilNothingPending } from "./items";
+import { allItems, clearItems, getItem, waitUntilSummarized } from "./items";
 import { fxtwitterAnswers, network, openrouterAnswers } from "./network";
 
 const TOKEN = process.env.INGEST_TOKEN!;
@@ -20,10 +20,10 @@ function post(body: unknown, token: string | null = TOKEN): Promise<Response> {
 describe("POST /api/ingest/link", () => {
   beforeEach(async () => {
     await clearItems();
-    // Every created Item starts processing in the background; give it somewhere to go.
+    // Every created Item gets its Summary written in the background; give those calls somewhere to go.
     network.use(fxtwitterAnswers("text-only"), openrouterAnswers());
   });
-  afterEach(() => waitUntilNothingPending());
+  afterEach(() => waitUntilSummarized());
 
   it("refuses a request without a token", async () => {
     const res = await post({ url: "https://example.com/a" }, null);
@@ -94,7 +94,7 @@ describe("POST /api/ingest/link", () => {
     const { id } = await res.json();
     expect((await getItem(id)).status).toBe("pending");
 
-    await waitUntilNothingPending();
+    await waitUntilSummarized();
     expect((await getItem(id)).status).toBe("done");
   });
 });

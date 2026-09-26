@@ -1,15 +1,9 @@
-import { CATEGORIES, toCategory, type Category } from "@/domain/category";
+import { CATEGORIES, toCategory } from "@/domain/category";
+import type { Summary } from "@/domain/summary";
 import { env } from "@/lib/env";
 import type { ContentPart } from "@/readers/types";
 
 const OPENROUTER_API = "https://openrouter.ai/api/v1/chat/completions";
-
-export type Summary = {
-  title: string;
-  description: string;
-  recap: string;
-  category: Category;
-};
 
 const INSTRUCTIONS = `Dostajesz treść zapisanego materiału: post z X, post z Instagrama, stronę www, wideo lub zdjęcie. Treść może być w dowolnym języku.
 

@@ -1,9 +1,10 @@
-import type { Category } from "./category";
+import type { LinkSource } from "./source";
+import type { Summary } from "./summary";
 
-export type Source = "x" | "instagram" | "web" | "upload";
+export type Source = LinkSource | "upload";
 export type Status = "pending" | "done" | "failed";
 
-/** A row of `items`. */
+/** A row of `items`. The Summary columns are null until the Item is done. */
 export type Item = {
   id: string;
   source: Source;
@@ -13,11 +14,7 @@ export type Item = {
   mime_type: string | null;
   status: Status;
   attempts: number;
-  title: string | null;
-  description: string | null;
-  recap: string | null;
-  category: Category | null;
   saved_at: string;
   digest_day: string;
   error: string | null;
-};
+} & { [K in keyof Summary]: Summary[K] | null };

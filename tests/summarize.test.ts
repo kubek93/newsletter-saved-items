@@ -1,11 +1,11 @@
 import { beforeEach, describe, expect, it } from "vitest";
-import { processItem } from "@/processing";
+import { summarizeItem } from "@/summarize";
 import { clearItems, getItem, insertPendingLink } from "./items";
 import { fxtwitterAnswers, network, openrouterAnswers, SAMPLE_REPLY, type OpenRouterRequest } from "./network";
 
 const X_POST = "https://x.com/jack/status/20";
 
-describe("processItem", () => {
+describe("summarizeItem", () => {
   beforeEach(clearItems);
 
   it("gives an X post a Polish Summary and a Category", async () => {
@@ -13,7 +13,7 @@ describe("processItem", () => {
     network.use(fxtwitterAnswers("text-only"), openrouterAnswers({ onRequest: (body) => requests.push(body) }));
     const id = await insertPendingLink(X_POST);
 
-    await processItem(id);
+    await summarizeItem(id);
 
     expect(await getItem(id)).toMatchObject({
       status: "done",
@@ -39,7 +39,7 @@ describe("processItem", () => {
     network.use(fxtwitterAnswers("with-photo"), openrouterAnswers({ onRequest: (body) => requests.push(body) }));
     const id = await insertPendingLink("https://x.com/BarackObama/status/896523232098078720");
 
-    await processItem(id);
+    await summarizeItem(id);
 
     expect((await getItem(id)).status).toBe("done");
     const userContent = requests[0].messages.find((m) => m.role === "user")!.content as { type: string }[];
@@ -51,7 +51,7 @@ describe("processItem", () => {
     network.use(fxtwitterAnswers("not-found"), openrouterAnswers());
     const id = await insertPendingLink("https://x.com/NASA/status/1832470848312496435");
 
-    await processItem(id);
+    await summarizeItem(id);
 
     const item = await getItem(id);
     expect(item.status).toBe("failed");
@@ -64,7 +64,7 @@ describe("processItem", () => {
     network.use(fxtwitterAnswers("text-only"), openrouterAnswers({ status: 500 }));
     const id = await insertPendingLink(X_POST);
 
-    await processItem(id);
+    await summarizeItem(id);
 
     expect(await getItem(id)).toMatchObject({ status: "failed", attempts: 1 });
     expect((await getItem(id)).error).toContain("500");
@@ -74,7 +74,7 @@ describe("processItem", () => {
     network.use(fxtwitterAnswers("text-only"), openrouterAnswers({ reply: { ...SAMPLE_REPLY, category: "Historia" } }));
     const id = await insertPendingLink(X_POST);
 
-    await processItem(id);
+    await summarizeItem(id);
 
     expect(await getItem(id)).toMatchObject({ status: "done", category: "Inne" });
   });
@@ -83,7 +83,7 @@ describe("processItem", () => {
     network.use(fxtwitterAnswers("text-only"), openrouterAnswers({ reply: "to nie jest JSON" }));
     const id = await insertPendingLink(X_POST);
 
-    await processItem(id);
+    await summarizeItem(id);
 
     expect(await getItem(id)).toMatchObject({ status: "failed", attempts: 1 });
   });
@@ -92,19 +92,17 @@ describe("processItem", () => {
     network.use(fxtwitterAnswers("not-found"));
     const id = await insertPendingLink(X_POST);
 
-    await processItem(id);
-    await processItem(id);
+    await summarizeItem(id);
+    await summarizeItem(id);
 
     expect(await getItem(id)).toMatchObject({ status: "failed", attempts: 2 });
   });
 
-  it("marks an Item Failed when its Source has no reader yet", async () => {
+  it("leaves an Item Pending when its Source has no reader yet", async () => {
     const id = await insertPendingLink("https://example.com/article");
 
-    await processItem(id);
+    await summarizeItem(id);
 
-    const item = await getItem(id);
-    expect(item.status).toBe("failed");
-    expect(item.error).toMatch(/web/);
+    expect(await getItem(id)).toMatchObject({ status: "pending", attempts: 0, error: null });
   });
 });

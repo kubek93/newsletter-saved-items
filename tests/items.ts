@@ -1,7 +1,6 @@
+import { newLinkItem } from "@/domain/link-item";
 import { supabaseAdmin } from "@/lib/supabase";
-import { digestDayFor } from "@/domain/digest-day";
-import { normalizeUrl } from "@/domain/url";
-import { detectSource } from "@/domain/source";
+import { hasReader } from "@/summarize";
 
 export async function clearItems() {
   const { error } = await supabaseAdmin.from("items").delete().not("id", "is", null);
@@ -22,29 +21,17 @@ export async function getItem(id: string) {
 
 /** A Pending link Item written straight to the table, for tests that exercise the job rather than ingest. */
 export async function insertPendingLink(url: string): Promise<string> {
-  const normalizedUrl = normalizeUrl(url);
-  const savedAt = new Date();
-  const { data, error } = await supabaseAdmin
-    .from("items")
-    .insert({
-      source: detectSource(normalizedUrl),
-      url,
-      normalized_url: normalizedUrl,
-      saved_at: savedAt.toISOString(),
-      digest_day: digestDayFor(savedAt),
-    })
-    .select("id")
-    .single();
+  const { data, error } = await supabaseAdmin.from("items").insert(newLinkItem(url)).select("id").single();
   if (error) throw error;
   return data.id;
 }
 
-/** Resolves once no Item is Pending any more, so background processing cannot leak into the next test. */
-export async function waitUntilNothingPending(timeoutMs = 10_000) {
+/** Resolves once every readable Item has left Pending, so a Summary still being written cannot leak into the next test. */
+export async function waitUntilSummarized(timeoutMs = 10_000) {
   const deadline = Date.now() + timeoutMs;
   while (Date.now() < deadline) {
     const items = await allItems();
-    if (items.every((item) => item.status !== "pending")) return;
+    if (items.every((item) => !hasReader(item.source) || item.status !== "pending")) return;
     await new Promise((resolve) => setTimeout(resolve, 25));
   }
   throw new Error("Items still pending after timeout");
