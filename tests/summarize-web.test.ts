@@ -20,7 +20,7 @@ describe("summarizeItem for web pages", () => {
 
     await summarizeItem(id);
 
-    expect(await getItem(id)).toMatchObject({ status: "done", attempts: 0 });
+    expect(await getItem(id)).toMatchObject({ status: "done", attempts: 1 });
     const content = userContent(requests[0]);
     expect(content.map((part) => part.type)).toEqual(["text"]);
     const text = JSON.stringify(content);
@@ -66,7 +66,7 @@ describe("summarizeItem for YouTube", () => {
 
     await summarizeItem(id);
 
-    expect(await getItem(id)).toMatchObject({ status: "done", attempts: 0 });
+    expect(await getItem(id)).toMatchObject({ status: "done", attempts: 1 });
     const content = userContent(requests[0]);
     expect(content.map((part) => part.type)).toEqual(["text", "video_url"]);
     expect(content[1]).toEqual({ type: "video_url", video_url: { url } });

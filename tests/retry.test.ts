@@ -21,7 +21,7 @@ describe("retryStuckItems", () => {
     const { retried } = await retryStuckItems(NOW);
 
     expect(retried).toEqual([id]);
-    expect(await getItem(id)).toMatchObject({ status: "done", attempts: 1, error: null });
+    expect(await getItem(id)).toMatchObject({ status: "done", attempts: 2, error: null });
   });
 
   it("leaves a Failed Item with three attempts alone", async () => {
@@ -45,7 +45,7 @@ describe("retryStuckItems", () => {
   });
 
   it("re-runs an Item stuck Pending for over an hour, not a fresh one", async () => {
-    const stuck = await insertLinkItem("https://x.com/jack/status/20", { saved_at: TWO_HOURS_AGO });
+    const stuck = await insertLinkItem(X_POST, { saved_at: TWO_HOURS_AGO });
     const fresh = await insertLinkItem("https://x.com/jack/status/21", { saved_at: TEN_MINUTES_AGO });
 
     const { retried } = await retryStuckItems(NOW);
@@ -53,6 +53,15 @@ describe("retryStuckItems", () => {
     expect(retried).toEqual([stuck]);
     expect((await getItem(stuck)).status).toBe("done");
     expect((await getItem(fresh)).status).toBe("pending");
+  });
+
+  it("gives up on an Item stuck Pending after three started attempts", async () => {
+    const id = await insertLinkItem(X_POST, { saved_at: TWO_HOURS_AGO, attempts: 3 });
+
+    const { retried } = await retryStuckItems(NOW);
+
+    expect(retried).toEqual([]);
+    expect((await getItem(id)).status).toBe("pending");
   });
 
   it("leaves done Items alone", async () => {
@@ -103,9 +112,12 @@ describe("GET /api/cron/retry", () => {
     expect(await (await call(process.env.CRON_SECRET!)).json()).toEqual({ retried: 1 });
   });
 
-  it("skips the other UTC slot so the retry happens once a day", async () => {
+  it.each([
+    ["summer", "2026-07-10T05:00:30Z"],
+    ["winter", "2026-01-10T04:00:30Z"],
+  ])("skips the other UTC slot in %s so the retry happens once a day", async (_season, at) => {
     vi.useFakeTimers({ toFake: ["Date"] });
-    vi.setSystemTime(new Date("2026-07-10T05:00:30Z"));
+    vi.setSystemTime(new Date(at));
     const id = await insertLinkItem(X_POST, { status: "failed", attempts: 1 });
 
     const res = await call(process.env.CRON_SECRET!);

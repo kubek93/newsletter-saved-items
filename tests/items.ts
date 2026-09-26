@@ -28,7 +28,7 @@ export async function insertPendingLink(url: string): Promise<string> {
 export async function insertLinkItem(url: string, overrides: Partial<Item> = {}): Promise<string> {
   const { data, error } = await supabaseAdmin
     .from("items")
-    .insert({ ...newLinkItem(url), ...overrides })
+    .insert({ ...newLinkItem(url, overrides.saved_at ? new Date(overrides.saved_at) : undefined), ...overrides })
     .select("id")
     .single();
   if (error) throw error;

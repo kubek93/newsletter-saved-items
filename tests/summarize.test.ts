@@ -26,7 +26,7 @@ describe("summarizeItem", () => {
 
     expect(await getItem(id)).toMatchObject({
       status: "done",
-      attempts: 0,
+      attempts: 1,
       title: SAMPLE_REPLY.title,
       description: SAMPLE_REPLY.description,
       recap: SAMPLE_REPLY.recap,

@@ -33,7 +33,7 @@ Anything that cannot be read (paywall, login wall, blocked scraper) makes the It
 - Runs asynchronously right after the Item is saved. The Item is visible in the Panel as Pending meanwhile.
 - One model for everything: a Gemini Flash-class model through OpenRouter (text, images, video, YouTube). Swapping models is a config change.
 - Output per Item: a short title, a detailed description of the content, a one-paragraph recap, and one Category from the closed list. Always in Polish.
-- Failure: the Item becomes Failed. It is retried once a day until three attempts in total have been made, then stays Failed.
+- Failure: the Item becomes Failed. It is retried once a day (06:00 Europe/Warsaw) until three attempts in total have been made, then stays Failed. An attempt counts from the moment it starts, so an attempt cut short by a timeout counts too, and an Item stuck Pending for over an hour is retried the same way.
 
 ## Categories
 
