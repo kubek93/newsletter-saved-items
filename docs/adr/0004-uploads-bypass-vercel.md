@@ -1,0 +1,3 @@
+# Photos and videos are uploaded straight to Supabase Storage, never through the app
+
+Vercel Functions reject request bodies over 4.5 MB, and Supabase Edge Functions have no ffmpeg and a 256 MB memory cap, so the ingest endpoint never receives file bytes. The Shortcut asks the app for a signed upload URL, PUTs the file directly into Supabase Storage, then registers the Item by storage path. The Owner still sees a single Share Sheet tap; the three HTTP calls live inside the Shortcut. Considered: a Storage key embedded in the Shortcut (rejected: a database credential on a phone), and Edge Functions as upload proxy (rejected: no benefit over direct upload). File limit is 100 MB and about 3 minutes of video; Supabase Pro allows this.
