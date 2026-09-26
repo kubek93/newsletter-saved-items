@@ -50,7 +50,7 @@ Accepted types: JPEG, PNG, WebP, MP4, QuickTime; the Shortcut converts HEIC to J
 Declared in `vercel.json`, invoked by Vercel Cron with `CRON_SECRET` as a bearer token. Vercel schedules run in UTC, so each job is scheduled at the two UTC hours that can be its Warsaw hour and the route only acts when the Europe/Warsaw clock matches:
 
 - `/api/cron/retry`, 06:00 Europe/Warsaw: re-runs the Summary for every Failed Item with fewer than three attempts and every Item stuck Pending for over an hour.
-- `/api/cron/digest`, 07:00 Europe/Warsaw: sends the Digest for the Digest Day that ended at 03:00 to every Recipient through Resend (`RESEND_API_KEY`, sender in `DIGEST_FROM`, links to Uploads built from `PANEL_URL`). The `digests` table records each sent day, so a doubled invocation never sends twice. Recipients live in the `recipients` table; until the Panel manages them, add one with SQL: `insert into recipients (email) values ('someone@example.com');`
+- `/api/cron/digest`, 07:00 Europe/Warsaw: sends the Digest for the Digest Day that ended at 03:00 to every Recipient through Resend (`RESEND_API_KEY`, sender in `DIGEST_FROM`, links to Uploads built from `PANEL_URL`). Every email is recorded in `digest_sends` before it is handed to Resend and the day is marked sent in `digests` once all Recipients have theirs, so neither a doubled invocation nor a retry after a partial failure sends anyone a Digest Day twice. Recipients live in the `recipients` table; until the Panel manages them, add one with SQL: `insert into recipients (email) values ('someone@example.com');`
 
 Run one locally: `curl -H "Authorization: Bearer $CRON_SECRET" http://localhost:3000/api/cron/retry` (outside the Warsaw hour it answers `{"skipped":true}`).
 

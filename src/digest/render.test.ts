@@ -57,8 +57,8 @@ describe("renderDigest", () => {
   it.each([
     ["a link Item points at the original", item({ url: "https://x.com/a/status/1" }), "https://x.com/a/status/1"],
     ["an Upload points at its Panel page", item({ id: "abc", source: "upload", url: null, storage_path: "2026/09/x.jpg" }), `${PANEL}/items/abc`],
-  ])("%s", (_name, it_, expected) => {
-    expect(linkFor(it_, PANEL)).toBe(expected);
+  ])("%s", (_name, saved, expected) => {
+    expect(linkFor(saved, PANEL)).toBe(expected);
   });
 
   it("lists Failed and still-Pending Items with their link and the note", () => {
@@ -83,6 +83,13 @@ describe("renderDigest", () => {
     expect(html).toContain("Pusty Digest.");
     expect(html).toContain("Tego dnia nic nie zostało zapisane.");
     expect(html).not.toContain("<h2>");
+  });
+
+  it("files a done Item whose Category is not on the list under Inne", () => {
+    const { html } = renderDigest("2026-09-25", [item({ category: "Historia" as never, title: "Stare dzieje" })], PANEL);
+
+    expect(html).toContain("<h2>Inne</h2>");
+    expect(html).toContain("Stare dzieje");
   });
 
   it("escapes HTML coming from the Summary", () => {

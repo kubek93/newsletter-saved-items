@@ -1,4 +1,4 @@
-import { CATEGORIES, type Category } from "@/domain/category";
+import { CATEGORIES, toCategory, type Category } from "@/domain/category";
 import { formatDigestDay } from "@/domain/digest-day";
 import type { Item } from "@/domain/item";
 
@@ -42,10 +42,10 @@ function renderUnreadable(item: Item, panelUrl: string): string {
 export function renderDigest(digestDay: string, items: Item[], panelUrl: string): RenderedDigest {
   const readable = items.filter((item) => item.status === "done");
   const unreadable = items.filter((item) => item.status !== "done");
-  const date = formatDigestDay(digestDay);
+  const dateLabel = formatDigestDay(digestDay);
 
   const sections = CATEGORIES.flatMap((category: Category) => {
-    const inCategory = readable.filter((item) => item.category === category);
+    const inCategory = readable.filter((item) => toCategory(item.category) === category);
     if (!inCategory.length) return [];
     return [`<section><h2>${escape(category)}</h2>\n${inCategory.map((item) => renderDone(item, panelUrl)).join("\n")}</section>`];
   });
@@ -64,14 +64,14 @@ export function renderDigest(digestDay: string, items: Item[], panelUrl: string)
   const count = items.length === 1 ? "1 rzecz" : `${items.length} rzeczy`;
   const html = `<!doctype html>
 <html lang="pl">
-<head><meta charset="utf-8"><title>Zapisane, ${escape(date)}</title></head>
+<head><meta charset="utf-8"><title>Zapisane, ${escape(dateLabel)}</title></head>
 <body style="font-family: -apple-system, Helvetica, Arial, sans-serif; max-width: 640px; margin: 0 auto; padding: 16px; line-height: 1.5;">
-<h1>Zapisane: ${escape(date)}</h1>
+<h1>Zapisane: ${escape(dateLabel)}</h1>
 <p>${items.length ? `Zapisane tego dnia: ${count}.` : "Pusty Digest."}</p>
 ${body}
 <p style="color: #777; font-size: 12px;">Codzienny Digest z rzeczy zapisanych przez właściciela. <a href="${escape(panelUrl)}">Panel</a></p>
 </body>
 </html>`;
 
-  return { subject: `Zapisane: ${date}`, html };
+  return { subject: `Zapisane: ${dateLabel}`, html };
 }

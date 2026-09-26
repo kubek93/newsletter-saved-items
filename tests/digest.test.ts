@@ -16,10 +16,16 @@ function resendRecords(calls: ResendCall[]) {
   });
 }
 
-function resendFails() {
-  return http.post("https://api.resend.com/emails", () =>
-    HttpResponse.json({ statusCode: 422, message: "Invalid `from` address" }, { status: 422 }),
-  );
+/** Resend rejects every email, or only those to `onlyTo`, recording the accepted ones in `calls`. */
+function resendFails(calls: ResendCall[] = [], onlyTo?: string) {
+  return http.post("https://api.resend.com/emails", async ({ request }) => {
+    const body = (await request.json()) as ResendCall;
+    if (onlyTo && body.to[0] !== onlyTo) {
+      calls.push(body);
+      return HttpResponse.json({ id: `email_${calls.length}` });
+    }
+    return HttpResponse.json({ statusCode: 422, message: "Invalid `from` address" }, { status: 422 });
+  });
 }
 
 async function setRecipients(...emails: string[]) {
@@ -33,6 +39,12 @@ async function setRecipients(...emails: string[]) {
 async function clearDigests() {
   const { error } = await supabaseAdmin.from("digests").delete().not("digest_day", "is", null);
   if (error) throw error;
+}
+
+async function sentTo(digestDay: string): Promise<string[]> {
+  const { data, error } = await supabaseAdmin.from("digest_sends").select("email").eq("digest_day", digestDay).order("email");
+  if (error) throw error;
+  return data.map((row) => row.email);
 }
 
 // 07:00 Europe/Warsaw on 26 September 2026 (CEST): the Digest Day that ended at 03:00 is 25 September.
@@ -56,7 +68,7 @@ describe("sendDigest", () => {
 
     const result = await sendDigest(MORNING);
 
-    expect(result).toEqual({ status: "sent", digestDay: "2026-09-25", items: 2, recipients: 2 });
+    expect(result).toEqual({ status: "sent", digestDay: "2026-09-25", items: 2, recipients: 2, emails: 2 });
     expect(calls.map((call) => call.to)).toEqual([["a@example.com"], ["b@example.com"]]);
     expect(calls[0].html).toBe(calls[1].html);
     expect(calls[0].from).toBe(process.env.DIGEST_FROM);
@@ -109,13 +121,30 @@ describe("sendDigest", () => {
     expect(calls[0].html).toContain(`${process.env.PANEL_URL}/items/${data!.id}`);
   });
 
-  it("releases the Digest Day when Resend rejects the email, so the next run can retry", async () => {
+  it("after a partial failure, a second run sends only to the Recipients who did not get it", async () => {
+    const first: ResendCall[] = [];
+    network.use(resendFails(first, "b@example.com"));
+    await expect(sendDigest(MORNING)).rejects.toThrow("Resend 422");
+    expect(first.map((call) => call.to[0])).toEqual(["a@example.com"]);
+    expect(await sentTo("2026-09-25")).toEqual(["a@example.com"]);
+    const { data: unsent } = await supabaseAdmin.from("digests").select("sent_at").eq("digest_day", "2026-09-25").single();
+    expect(unsent!.sent_at).toBeNull();
+
+    const second: ResendCall[] = [];
+    network.use(resendRecords(second));
+    const result = await sendDigest(MORNING);
+
+    expect(result).toMatchObject({ status: "sent", recipients: 2, emails: 1 });
+    expect(second.map((call) => call.to[0])).toEqual(["b@example.com"]);
+    expect(await sentTo("2026-09-25")).toEqual(["a@example.com", "b@example.com"]);
+  });
+
+  it("never sends when Resend rejects everything, and leaves the day open", async () => {
     network.use(resendFails());
 
     await expect(sendDigest(MORNING)).rejects.toThrow("Resend 422");
 
-    const { data } = await supabaseAdmin.from("digests").select("digest_day");
-    expect(data).toEqual([]);
+    expect(await sentTo("2026-09-25")).toEqual([]);
   });
 
   it("records the day even with no Recipients", async () => {
@@ -160,7 +189,7 @@ describe("GET /api/cron/digest", () => {
 
     const res = await call(process.env.CRON_SECRET!);
 
-    expect(await res.json()).toEqual({ status: "sent", digestDay, items: 0, recipients: 1 });
+    expect(await res.json()).toEqual({ status: "sent", digestDay, items: 0, recipients: 1, emails: 1 });
     expect(calls).toHaveLength(1);
   });
 
