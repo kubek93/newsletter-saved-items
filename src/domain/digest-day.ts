@@ -30,3 +30,17 @@ export function digestDayFor(savedAt: Date): string {
   }
   return localDate.toISOString().slice(0, 10);
 }
+
+/** The Digest Day that has already ended at `now`: the one before the day `now` falls in. Sent each morning. */
+export function digestDayEndedBefore(now: Date): string {
+  const current = new Date(`${digestDayFor(now)}T00:00:00Z`);
+  current.setUTCDate(current.getUTCDate() - 1);
+  return current.toISOString().slice(0, 10);
+}
+
+/** A Digest Day as people read it: "26 września 2026". */
+export function formatDigestDay(digestDay: string): string {
+  return new Intl.DateTimeFormat("pl-PL", { timeZone: "UTC", day: "numeric", month: "long", year: "numeric" }).format(
+    new Date(`${digestDay}T00:00:00Z`),
+  );
+}

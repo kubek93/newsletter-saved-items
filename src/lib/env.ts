@@ -14,4 +14,7 @@ export const env = {
   apifyToken: required("APIFY_TOKEN"),
   apifyActor: required("APIFY_ACTOR"),
   cronSecret: required("CRON_SECRET"),
+  resendApiKey: required("RESEND_API_KEY"),
+  digestFrom: required("DIGEST_FROM"),
+  panelUrl: required("PANEL_URL"),
 };
