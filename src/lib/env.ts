@@ -11,4 +11,6 @@ export const env = {
   openrouterApiKey: required("OPENROUTER_API_KEY"),
   openrouterModel: required("OPENROUTER_MODEL"),
   jinaApiKey: required("JINA_API_KEY"),
+  apifyToken: required("APIFY_TOKEN"),
+  apifyActor: required("APIFY_ACTOR"),
 };

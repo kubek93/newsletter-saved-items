@@ -1,0 +1,76 @@
+{
+  "code": 200,
+  "message": "OK",
+  "tweet": {
+    "url": "https://x.com/NASA/status/1900000000000000001",
+    "id": "1900000000000000001",
+    "text": "Watch the full launch sequence from this morning's Artemis test. Sound on.",
+    "raw_text": {
+      "text": "Watch the full launch sequence from this morning's Artemis test. Sound on.",
+      "display_text_range": [0, 74],
+      "facets": []
+    },
+    "author": {
+      "id": "11348282",
+      "name": "NASA",
+      "screen_name": "NASA",
+      "avatar_url": "https://pbs.twimg.com/profile_images/1321163587679784960/0ZxKlEKB_200x200.jpg",
+      "banner_url": null,
+      "description": "There's space for everybody.",
+      "location": "",
+      "url": "https://x.com/NASA",
+      "followers": 80000000,
+      "following": 200,
+      "joined": "Tue Dec 19 20:20:32 +0000 2007",
+      "likes": 0,
+      "website": null,
+      "tweets": 70000,
+      "avatar_color": null
+    },
+    "replies": 120,
+    "retweets": 800,
+    "likes": 5400,
+    "bookmarks": 300,
+    "quotes": 40,
+    "views": 900000,
+    "created_at": "Mon Sep 22 14:00:00 +0000 2026",
+    "created_timestamp": 1790085600,
+    "possibly_sensitive": false,
+    "is_note_tweet": false,
+    "community_note": null,
+    "lang": "en",
+    "replying_to": null,
+    "replying_to_status": null,
+    "reposted_by": null,
+    "media": {
+      "all": [
+        {
+          "type": "video",
+          "url": "https://video.twimg.com/amplify_video/1900000000000000000/vid/avc1/1280x720/AbCdEfGh.mp4?tag=16",
+          "thumbnail_url": "https://pbs.twimg.com/amplify_video_thumb/1900000000000000000/img/ThUmBnAiL.jpg",
+          "duration": 42.5,
+          "width": 1280,
+          "height": 720,
+          "format": "video/mp4",
+          "variants": []
+        }
+      ],
+      "videos": [
+        {
+          "type": "video",
+          "url": "https://video.twimg.com/amplify_video/1900000000000000000/vid/avc1/1280x720/AbCdEfGh.mp4?tag=16",
+          "thumbnail_url": "https://pbs.twimg.com/amplify_video_thumb/1900000000000000000/img/ThUmBnAiL.jpg",
+          "duration": 42.5,
+          "width": 1280,
+          "height": 720,
+          "format": "video/mp4",
+          "variants": []
+        }
+      ]
+    },
+    "source": "Twitter Web App",
+    "twitter_card": "player",
+    "color": null,
+    "provider": "twitter"
+  }
+}

@@ -1,7 +1,16 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { summarizeItem } from "@/summarize";
-import { clearItems, getItem, insertPendingLink } from "./items";
-import { fxtwitterAnswers, network, openrouterAnswers, SAMPLE_REPLY, type OpenRouterRequest } from "./network";
+import { clearItems, getItem, insertPendingLink, insertPendingUpload } from "./items";
+import {
+  fxtwitterAnswers,
+  network,
+  openrouterAnswers,
+  openrouterCaptures,
+  SAMPLE_REPLY,
+  userContent,
+  videoFileAnswers,
+  type OpenRouterRequest,
+} from "./network";
 
 const X_POST = "https://x.com/jack/status/20";
 
@@ -98,8 +107,24 @@ describe("summarizeItem", () => {
     expect(await getItem(id)).toMatchObject({ status: "failed", attempts: 2 });
   });
 
+  it("downloads a post's video and sends it to the model inline", async () => {
+    const requests: OpenRouterRequest[] = [];
+    const videoUrl = "https://video.twimg.com/amplify_video/1900000000000000000/vid/avc1/1280x720/AbCdEfGh.mp4?tag=16";
+    const bytes = new Uint8Array([1, 2, 3, 4]);
+    network.use(fxtwitterAnswers("with-video"), videoFileAnswers(videoUrl, bytes), openrouterCaptures(requests));
+    const id = await insertPendingLink("https://x.com/NASA/status/1900000000000000001");
+
+    await summarizeItem(id);
+
+    expect((await getItem(id)).status).toBe("done");
+    const content = userContent(requests[0]);
+    expect(content.map((part) => part.type)).toEqual(["text", "video_url"]);
+    expect((content[1].video_url as { url: string }).url).toBe(`data:video/mp4;base64,${Buffer.from(bytes).toString("base64")}`);
+    expect(requests[0].provider).toEqual({ only: ["google-ai-studio"] });
+  });
+
   it("leaves an Item Pending when its Source has no reader yet", async () => {
-    const id = await insertPendingLink("https://www.instagram.com/p/abc/");
+    const id = await insertPendingUpload("uploads/photo.jpg", "image/jpeg");
 
     await summarizeItem(id);
 

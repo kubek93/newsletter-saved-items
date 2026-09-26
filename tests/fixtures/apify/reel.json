@@ -1,0 +1,32 @@
+[
+  {
+    "inputUrl": "https://www.instagram.com/reel/C2reelXYZ1/",
+    "id": "3270123456789012345",
+    "type": "Video",
+    "shortCode": "C2reelXYZ1",
+    "caption": "Trzy ćwiczenia na mobilność bioder przed przysiadem. Zapisz na później.",
+    "hashtags": [],
+    "mentions": [],
+    "url": "https://www.instagram.com/reel/C2reelXYZ1/",
+    "commentsCount": 41,
+    "firstComment": "",
+    "latestComments": [],
+    "dimensionsHeight": 1920,
+    "dimensionsWidth": 1080,
+    "displayUrl": "https://scontent-waw2-1.cdninstagram.com/v/t51.2885-15/567890123_2345678901_n.jpg",
+    "images": [],
+    "videoUrl": "https://scontent-waw2-1.cdninstagram.com/o1/v/t16/f2/m86/AQNreel123.mp4?efg=eyJ2ZW5jb2RlX3RhZyI6InZ0c192b2RfdXJsZ2VuIn0",
+    "alt": null,
+    "likesCount": 2210,
+    "videoViewCount": 51200,
+    "videoPlayCount": 68400,
+    "timestamp": "2026-09-21T17:45:10.000Z",
+    "childPosts": [],
+    "ownerFullName": "Coach Marek",
+    "ownerUsername": "coach.marek",
+    "ownerId": "987654321",
+    "productType": "clips",
+    "videoDuration": 14.2,
+    "isSponsored": false
+  }
+]

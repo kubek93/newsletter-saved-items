@@ -1,4 +1,5 @@
 import type { ContentPart, Reader } from "./types";
+import { downloadVideo } from "./video";
 
 const FXTWITTER_API = "https://api.fxtwitter.com";
 
@@ -12,7 +13,7 @@ type FxTwitterResponse = {
   } | null;
 };
 
-/** Reads an X post through the FxTwitter public API: text, author and media. No auth. */
+/** Reads an X post through the FxTwitter public API: text, author, photos, and videos downloaded inline (ADR 0005). */
 export const readX: Reader = async (item) => {
   const match = /\/status\/(\d+)/.exec(item.url ?? "");
   if (!match) throw new Error(`Not an X post URL: ${item.url}`);
@@ -26,7 +27,7 @@ export const readX: Reader = async (item) => {
   const { text, author, media } = body.tweet;
   const parts: ContentPart[] = [{ type: "text", text: `@${author.screen_name} (${author.name}):\n${text}` }];
   for (const attachment of media?.all ?? []) {
-    parts.push(attachment.type === "photo" ? { type: "image", url: attachment.url } : { type: "video", url: attachment.url });
+    parts.push(attachment.type === "photo" ? { type: "image", url: attachment.url } : await downloadVideo(attachment.url));
   }
   return parts;
 };

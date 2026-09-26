@@ -21,7 +21,7 @@ function fixture(relative: string): unknown {
 }
 
 /** FxTwitter answers every post lookup with the named recorded response. */
-export function fxtwitterAnswers(name: "text-only" | "with-photo" | "not-found") {
+export function fxtwitterAnswers(name: "text-only" | "with-photo" | "with-video" | "not-found") {
   const body = fixture(`fxtwitter/${name}.json`) as { code: number };
   return http.get("https://api.fxtwitter.com/*", () => HttpResponse.json(body, { status: body.code }));
 }
@@ -30,6 +30,28 @@ export function fxtwitterAnswers(name: "text-only" | "with-photo" | "not-found")
 export function jinaAnswers(name: "page" | "not-found" | "unresolvable") {
   const body = fixture(`jina/${name}.json`) as { code: number };
   return http.get("https://r.jina.ai/*", () => HttpResponse.json(body, { status: body.code }));
+}
+
+const APIFY_RUN = "https://api.apify.com/v2/acts/*/run-sync-get-dataset-items";
+
+/** The Apify actor run answers with the named recorded dataset. */
+export function apifyAnswers(name: "photo" | "reel" | "sidecar" | "empty" | "blocked") {
+  return http.post(APIFY_RUN, () => HttpResponse.json(fixture(`apify/${name}.json`) as unknown[], { status: 201 }));
+}
+
+/** The Apify actor run fails with an API error. */
+export function apifyFails(status: number, message: string) {
+  return http.post(APIFY_RUN, () => HttpResponse.json({ error: { type: "error", message } }, { status }));
+}
+
+/** A video file on a CDN. `declaredLength` fakes a Content-Length larger than the body, to test the size guard. */
+export function videoFileAnswers(url: string, bytes: Uint8Array, declaredLength?: number) {
+  const { origin, pathname } = new URL(url);
+  return http.get(origin + pathname, () =>
+    HttpResponse.arrayBuffer(bytes.buffer as ArrayBuffer, {
+      headers: { "content-type": "video/mp4", "content-length": String(declaredLength ?? bytes.byteLength) },
+    }),
+  );
 }
 
 export type OpenRouterOptions = {
