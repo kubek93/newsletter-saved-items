@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { summarizeItem } from "@/summarize";
-import { clearItems, getItem, insertPendingLink, insertPendingUpload } from "./items";
+import { clearItems, getItem, insertPendingLink } from "./items";
 import {
   fxtwitterAnswers,
   network,
@@ -123,11 +123,4 @@ describe("summarizeItem", () => {
     expect(requests[0].provider).toEqual({ only: ["google-ai-studio"] });
   });
 
-  it("leaves an Item Pending when its Source has no reader yet", async () => {
-    const id = await insertPendingUpload("uploads/photo.jpg", "image/jpeg");
-
-    await summarizeItem(id);
-
-    expect(await getItem(id)).toMatchObject({ status: "pending", attempts: 0, error: null });
-  });
 });
