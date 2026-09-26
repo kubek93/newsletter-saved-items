@@ -38,6 +38,11 @@ export function digestDayEndedBefore(now: Date): string {
   return current.toISOString().slice(0, 10);
 }
 
+/** True for a Digest Day written as YYYY-MM-DD. */
+export function isDigestDay(value: unknown): value is string {
+  return typeof value === "string" && /^\d{4}-\d{2}-\d{2}$/.test(value);
+}
+
 /** A Digest Day as people read it: "26 września 2026". */
 export function formatDigestDay(digestDay: string): string {
   return new Intl.DateTimeFormat("pl-PL", { timeZone: "UTC", day: "numeric", month: "long", year: "numeric" }).format(

@@ -17,4 +17,6 @@ export const env = {
   resendApiKey: required("RESEND_API_KEY"),
   digestFrom: required("DIGEST_FROM"),
   panelUrl: required("PANEL_URL"),
+  supabaseAnonKey: required("SUPABASE_ANON_KEY"),
+  ownerEmail: required("OWNER_EMAIL"),
 };
