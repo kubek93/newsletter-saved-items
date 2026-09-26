@@ -54,6 +54,11 @@ h1 {
   margin-bottom: 16px;
 }
 
+.topbar nav {
+  margin-left: auto;
+  margin-right: 16px;
+}
+
 .topbar span {
   color: var(--muted);
   font-size: 0.9rem;

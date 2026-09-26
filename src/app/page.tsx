@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { requireOwner } from "@/panel/auth";
 import { ItemList } from "@/panel/ItemList";
 import { listItems, parseFilters } from "@/panel/items";
@@ -14,6 +15,9 @@ export default async function ItemsPage({
     <main>
       <header className="topbar">
         <h1>Zapisane</h1>
+        <nav>
+          <Link href="/recipients">Odbiorcy</Link>
+        </nav>
         <form method="post" action="/auth/logout">
           <span>{email}</span> <button type="submit">Wyloguj</button>
         </form>
