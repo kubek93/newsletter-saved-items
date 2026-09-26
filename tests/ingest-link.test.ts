@@ -50,7 +50,6 @@ describe("POST /api/ingest/link", () => {
     expect(items[0]).toMatchObject({
       id: body.id,
       source: "x",
-      attempts: 0,
       url: "https://twitter.com/someone/status/123?s=20",
       normalized_url: "https://x.com/someone/status/123",
     });

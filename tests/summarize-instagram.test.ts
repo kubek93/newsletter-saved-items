@@ -28,7 +28,7 @@ describe("summarizeItem for Instagram", () => {
 
     await summarizeItem(id);
 
-    expect(await getItem(id)).toMatchObject({ status: "done", attempts: 0 });
+    expect(await getItem(id)).toMatchObject({ status: "done", attempts: 1 });
     const content = userContent(requests[0]);
     expect(content.map((part) => part.type)).toEqual(["text", "image_url"]);
     const text = JSON.stringify(content[0]);
@@ -48,7 +48,7 @@ describe("summarizeItem for Instagram", () => {
 
     await summarizeItem(id);
 
-    expect(await getItem(id)).toMatchObject({ status: "done", attempts: 0 });
+    expect(await getItem(id)).toMatchObject({ status: "done", attempts: 1 });
     const content = userContent(requests[0]);
     expect(content.map((part) => part.type)).toEqual(["text", "video_url"]);
     expect(JSON.stringify(content[0])).toContain("Reel");

@@ -1,3 +1,4 @@
+import type { Item } from "@/domain/item";
 import { newLinkItem } from "@/domain/link-item";
 import { supabaseAdmin } from "@/lib/supabase";
 
@@ -20,7 +21,16 @@ export async function getItem(id: string) {
 
 /** A Pending link Item written straight to the table, for tests that exercise the job rather than ingest. */
 export async function insertPendingLink(url: string): Promise<string> {
-  const { data, error } = await supabaseAdmin.from("items").insert(newLinkItem(url)).select("id").single();
+  return insertLinkItem(url);
+}
+
+/** A link Item in any state, for tests that start from history (Failed, stuck Pending, done). */
+export async function insertLinkItem(url: string, overrides: Partial<Item> = {}): Promise<string> {
+  const { data, error } = await supabaseAdmin
+    .from("items")
+    .insert({ ...newLinkItem(url, overrides.saved_at ? new Date(overrides.saved_at) : undefined), ...overrides })
+    .select("id")
+    .single();
   if (error) throw error;
   return data.id;
 }

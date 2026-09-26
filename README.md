@@ -45,6 +45,14 @@ curl -X POST http://localhost:3000/api/ingest/upload -H "Authorization: Bearer $
 
 Accepted types: JPEG, PNG, WebP, MP4, QuickTime; the Shortcut converts HEIC to JPEG first. Uploads are never deduplicated. A video above about 15 MB cannot be analysed (ADR 0005) and ends Failed. A created Item is analysed in the background: its Source is read (X posts through FxTwitter, Instagram posts and Reels through an Apify actor, web pages as text through Jina Reader, YouTube links straight to the model as video; other videos are downloaded and sent inline, see ADR 0005), the content goes to the model configured in `OPENROUTER_MODEL`, and the row ends up `done` with a Polish title, description, recap and Category, or `failed` with the error text and one more attempt counted.
 
+## Cron jobs
+
+Declared in `vercel.json`, invoked by Vercel Cron with `CRON_SECRET` as a bearer token. Vercel schedules run in UTC, so each job is scheduled at the two UTC hours that can be its Warsaw hour and the route only acts when the Europe/Warsaw clock matches:
+
+- `/api/cron/retry`, 06:00 Europe/Warsaw: re-runs the Summary for every Failed Item with fewer than three attempts and every Item stuck Pending for over an hour.
+
+Run one locally: `curl -H "Authorization: Bearer $CRON_SECRET" http://localhost:3000/api/cron/retry` (outside the Warsaw hour it answers `{"skipped":true}`).
+
 ## Tests
 
 Tests need the local Supabase running (`supabase start`, with Storage; the `uploads` bucket comes from a migration). They read `.env.test`, which points at the local instance with its demo keys.
