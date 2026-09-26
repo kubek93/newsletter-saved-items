@@ -1,22 +1,21 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { summarizeItem } from "@/summarize";
 import { clearItems, getItem, insertPendingLink } from "./items";
-import { jinaAnswers, network, openrouterAnswers, type OpenRouterRequest } from "./network";
-
-function capture(requests: OpenRouterRequest[]) {
-  return openrouterAnswers({ onRequest: (body) => requests.push(body) });
-}
-
-function userContent(request: OpenRouterRequest) {
-  return request.messages.find((m) => m.role === "user")!.content as { type: string; [key: string]: unknown }[];
-}
+import {
+  jinaAnswers,
+  network,
+  openrouterAnswers,
+  openrouterCaptures,
+  userContent,
+  type OpenRouterRequest,
+} from "./network";
 
 describe("summarizeItem for web pages", () => {
   beforeEach(clearItems);
 
   it("gives a web page a Summary based on the page text from Jina Reader", async () => {
     const requests: OpenRouterRequest[] = [];
-    network.use(jinaAnswers("page"), capture(requests));
+    network.use(jinaAnswers("page"), openrouterCaptures(requests));
     const id = await insertPendingLink("https://en.wikipedia.org/wiki/Ceramic_glaze");
 
     await summarizeItem(id);
@@ -62,7 +61,7 @@ describe("summarizeItem for YouTube", () => {
     ["YouTube Shorts", "https://www.youtube.com/shorts/dQw4w9WgXcQ"],
   ])("sends a %s link to the model as video, pinned to Google AI Studio", async (_name, url) => {
     const requests: OpenRouterRequest[] = [];
-    network.use(capture(requests));
+    network.use(openrouterCaptures(requests));
     const id = await insertPendingLink(url);
 
     await summarizeItem(id);
@@ -74,13 +73,28 @@ describe("summarizeItem for YouTube", () => {
     expect(requests[0].provider).toEqual({ only: ["google-ai-studio"] });
   });
 
-  it("never asks Jina Reader about a YouTube link", async () => {
+  it("never asks Jina Reader about a YouTube video", async () => {
     network.use(openrouterAnswers());
     const id = await insertPendingLink("https://www.youtube.com/watch?v=abc");
 
     await summarizeItem(id);
 
     expect((await getItem(id)).status).toBe("done");
+  });
+
+  it.each([
+    ["a channel", "https://www.youtube.com/@veritasium"],
+    ["a playlist", "https://www.youtube.com/playlist?list=PL123"],
+    ["the home page", "https://www.youtube.com/"],
+  ])("reads %s as an ordinary page through Jina Reader", async (_name, url) => {
+    const requests: OpenRouterRequest[] = [];
+    network.use(jinaAnswers("page"), openrouterCaptures(requests));
+    const id = await insertPendingLink(url);
+
+    await summarizeItem(id);
+
+    expect((await getItem(id)).status).toBe("done");
+    expect(userContent(requests[0]).map((part) => part.type)).toEqual(["text"]);
   });
 
   it("marks the Item Failed when the model rejects the video", async () => {

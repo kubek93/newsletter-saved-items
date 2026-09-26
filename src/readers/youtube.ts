@@ -1,9 +1,11 @@
 import type { Reader } from "./types";
 
-const YOUTUBE_HOSTS = new Set(["youtube.com", "www.youtube.com", "m.youtube.com", "youtu.be"]);
-
-export function isYouTubeUrl(url: string): boolean {
-  return YOUTUBE_HOSTS.has(new URL(url).hostname);
+/** True for a link to one YouTube video (watch, Shorts, youtu.be). Channels and playlists are ordinary pages. */
+export function isYouTubeVideoUrl(url: string): boolean {
+  const { hostname, pathname, searchParams } = new URL(url);
+  if (hostname === "youtu.be") return pathname.length > 1;
+  if (!/^(www\.|m\.)?youtube\.com$/.test(hostname)) return false;
+  return (pathname === "/watch" && searchParams.has("v")) || pathname.startsWith("/shorts/");
 }
 
 /** A YouTube video is not fetched at all: the model watches it from the URL (Gemini via Google AI Studio). */

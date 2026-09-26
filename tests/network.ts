@@ -48,6 +48,16 @@ export type OpenRouterRequest = {
   provider?: unknown;
 };
 
+/** OpenRouter answers normally and every request body lands in `requests`, for asserting on what the model was asked. */
+export function openrouterCaptures(requests: OpenRouterRequest[]) {
+  return openrouterAnswers({ onRequest: (body) => requests.push(body) });
+}
+
+/** The user message's content parts of a captured request. */
+export function userContent(request: OpenRouterRequest) {
+  return request.messages.find((m) => m.role === "user")!.content as { type: string; [key: string]: unknown }[];
+}
+
 export const SAMPLE_REPLY = {
   title: "Pierwszy tweet w historii",
   description: "Jack Dorsey ogłasza uruchomienie swojego konta na Twitterze krótkim wpisem „just setting up my twttr”.",
