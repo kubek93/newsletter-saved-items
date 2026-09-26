@@ -10,6 +10,11 @@ const formatter = new Intl.DateTimeFormat("en-CA", {
   hourCycle: "h23",
 });
 
+/** The hour of the day (0 to 23) in Europe/Warsaw, where every schedule in this tool is expressed. */
+export function hourInWarsaw(at: Date): number {
+  return Number(formatter.formatToParts(at).find((part) => part.type === "hour")!.value);
+}
+
 /**
  * The Digest Day (YYYY-MM-DD) an Item saved at `savedAt` belongs to.
  * A Digest Day runs 03:00 to 03:00 Europe/Warsaw, so a save at 01:00 counts for the day that is ending.

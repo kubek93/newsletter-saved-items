@@ -13,4 +13,5 @@ export const env = {
   jinaApiKey: required("JINA_API_KEY"),
   apifyToken: required("APIFY_TOKEN"),
   apifyActor: required("APIFY_ACTOR"),
+  cronSecret: required("CRON_SECRET"),
 };
