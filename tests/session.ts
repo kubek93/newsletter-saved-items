@@ -35,8 +35,17 @@ export async function sessionCookiesFor(email: string): Promise<Cookie[]> {
 }
 
 /** A request to the Panel as a browser with these cookies would make it. */
-export function panelRequest(path: string, cookies: Cookie[] = []): NextRequest {
-  const request = new NextRequest(new URL(path, "http://localhost:3000"));
+export function panelRequest(path: string, cookies: Cookie[] = [], init?: ConstructorParameters<typeof NextRequest>[1]): NextRequest {
+  const request = new NextRequest(new URL(path, "http://localhost:3000"), init);
   for (const { name, value } of cookies) request.cookies.set(name, value);
   return request;
+}
+
+/** A submitted HTML form, as the browser posts it. */
+export function formRequest(path: string, fields: Record<string, string>, cookies: Cookie[] = []): NextRequest {
+  return panelRequest(path, cookies, {
+    method: "POST",
+    headers: { "content-type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams(fields).toString(),
+  });
 }

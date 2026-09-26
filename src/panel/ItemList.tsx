@@ -1,11 +1,8 @@
 import Link from "next/link";
 import { CATEGORIES } from "@/domain/category";
-import type { Item, Source, Status } from "@/domain/item";
-import { uploadFilename } from "@/domain/upload-item";
+import type { Item } from "@/domain/item";
 import type { ItemFilters } from "./items";
-
-const SOURCE_LABELS: Record<Source, string> = { x: "X", instagram: "Instagram", web: "Web", upload: "Plik" };
-const STATUS_LABELS: Record<Status, string> = { pending: "Czeka na opis", done: "Gotowe", failed: "Nie odczytano" };
+import { itemLabel, SOURCE_LABELS, STATUS_LABELS } from "./labels";
 
 const dateFormat = new Intl.DateTimeFormat("pl-PL", {
   timeZone: "Europe/Warsaw",
@@ -15,11 +12,6 @@ const dateFormat = new Intl.DateTimeFormat("pl-PL", {
   hour: "2-digit",
   minute: "2-digit",
 });
-
-/** What the Owner sees for an Item before it has a title: the link itself, or the file name. */
-function itemLabel(item: Item): string {
-  return item.title ?? item.url ?? (item.storage_path ? uploadFilename(item.storage_path) : item.id);
-}
 
 export function ItemList({ items, filters }: { items: Item[]; filters: ItemFilters }) {
   return (

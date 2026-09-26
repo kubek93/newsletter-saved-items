@@ -130,3 +130,64 @@ tr.failed td:nth-child(3) {
 .login form {
   margin-top: 24px;
 }
+
+.item h2 {
+  font-size: 1.3rem;
+  margin: 8px 0 16px;
+  overflow-wrap: anywhere;
+}
+
+.meta {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 6px 16px;
+  margin: 0 0 16px;
+}
+
+.meta dt {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.meta dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.meta dd.failed {
+  color: #b3261e;
+}
+
+form.inline {
+  display: inline-flex;
+  gap: 8px;
+}
+
+.preview {
+  display: block;
+  max-width: 100%;
+  max-height: 70vh;
+  border-radius: 8px;
+  margin: 0 0 16px;
+}
+
+.summary {
+  margin-bottom: 24px;
+}
+
+.recap {
+  color: var(--muted);
+}
+
+p.failed code {
+  color: #b3261e;
+}
+
+form.danger {
+  border-top: 1px solid var(--line);
+  padding-top: 16px;
+}
+
+form.danger button {
+  color: #b3261e;
+}

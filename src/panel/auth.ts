@@ -55,6 +55,25 @@ export function supabaseForRoute(request: NextRequest) {
   return { supabase, redirectTo };
 }
 
+/**
+ * For Route Handlers behind the Panel: the proxy already keeps strangers out, but a handler that changes
+ * data checks for itself. Either a 401 to return, or a redirect helper for the happy path.
+ */
+export async function ownerOr401(
+  request: NextRequest,
+): Promise<{ refused: Response } | { refused?: undefined; redirectTo: (path: string) => NextResponse }> {
+  // The session lives in a cookie, so a form posted from another site must not count. Browsers send
+  // Origin on every POST; when it is there it has to be the Panel itself.
+  const origin = request.headers.get("origin");
+  if (origin && origin !== new URL(env.panelUrl).origin) {
+    return { refused: new Response("Forbidden", { status: 403 }) };
+  }
+  const { supabase, redirectTo } = supabaseForRoute(request);
+  const access = await accessOf(supabase);
+  if (access.access !== "owner") return { refused: new Response("Unauthorized", { status: 401 }) };
+  return { redirectTo };
+}
+
 /** For Panel pages: the Owner's email, or a redirect to sign-in (with a refusal message for anyone else). */
 export async function requireOwner(): Promise<string> {
   const supabase = await supabaseForPage();

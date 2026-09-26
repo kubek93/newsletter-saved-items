@@ -1,7 +1,9 @@
 import { isCategory, type Category } from "@/domain/category";
 import { isDigestDay } from "@/domain/digest-day";
 import type { Item } from "@/domain/item";
+import { isVideoMimeType } from "@/domain/upload-item";
 import { supabaseAdmin } from "@/lib/supabase";
+import { signedUploadUrl, uploadsBucket } from "@/lib/uploads";
 
 /** What the Item list can be narrowed to. Dates are Digest Days (YYYY-MM-DD), inclusive. */
 export type ItemFilters = { category?: Category; from?: string; to?: string };
@@ -28,4 +30,35 @@ export async function listItems(filters: ItemFilters): Promise<Item[]> {
   const { data, error } = await query;
   if (error) throw error;
   return data as Item[];
+}
+
+export async function loadItem(id: string): Promise<Item | null> {
+  const { data, error } = await supabaseAdmin.from("items").select("*").eq("id", id).maybeSingle();
+  if (error) throw error;
+  return data as Item | null;
+}
+
+export type Media = { kind: "image" | "video"; url: string };
+
+/** For an Upload: a short-lived signed URL to show the file in the Panel. Null for link Items. */
+export async function mediaFor(item: Item): Promise<Media | null> {
+  if (item.source !== "upload" || !item.storage_path) return null;
+  return { kind: isVideoMimeType(item.mime_type ?? "") ? "video" : "image", url: await signedUploadUrl(item.storage_path) };
+}
+
+/** The Owner overrides the model's pick. False when there is no such Item. */
+export async function changeCategory(id: string, category: Category): Promise<boolean> {
+  const { data, error } = await supabaseAdmin.from("items").update({ category }).eq("id", id).select("id");
+  if (error) throw error;
+  return data.length === 1;
+}
+
+/** Removes the Item for good, together with its file when it is an Upload. */
+export async function deleteItem(item: Item): Promise<void> {
+  if (item.source === "upload" && item.storage_path) {
+    const { error } = await uploadsBucket().remove([item.storage_path]);
+    if (error) throw new Error(`Storage delete failed: ${error.message}`);
+  }
+  const { error } = await supabaseAdmin.from("items").delete().eq("id", item.id);
+  if (error) throw error;
 }

@@ -61,7 +61,7 @@ describe("ItemList", () => {
     expect([...order].sort((a, b) => a - b)).toEqual(order);
 
     expect(html).toContain("<th>Tytuł</th><th>Źródło</th><th>Stan</th><th>Kategoria</th><th>Zapisano</th>");
-    expect(html).toContain("<td>Instagram</td><td>Czeka na opis</td><td>–</td>");
+    expect(html).toContain("<td>Instagram</td><td>Czeka na podsumowanie</td><td>–</td>");
     expect(html).toContain("<td>Web</td><td>Nie odczytano</td>");
     expect(html).toContain("<td>X</td><td>Gotowe</td><td>AI</td>");
     expect(html).toContain('<time dateTime="2026-09-20T10:00:00+00:00">20 wrz 2026, 12:00</time>');
