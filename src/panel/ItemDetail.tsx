@@ -1,11 +1,9 @@
 import Link from "next/link";
 import { CATEGORIES } from "@/domain/category";
-import type { Item, Source, Status } from "@/domain/item";
+import type { Item } from "@/domain/item";
 import { uploadFilename } from "@/domain/upload-item";
-import type { Media } from "./item-actions";
-
-const SOURCE_LABELS: Record<Source, string> = { x: "X", instagram: "Instagram", web: "Web", upload: "Plik" };
-const STATUS_LABELS: Record<Status, string> = { pending: "Czeka na opis", done: "Gotowe", failed: "Nie odczytano" };
+import type { Media } from "./items";
+import { itemLabel, SOURCE_LABELS, STATUS_LABELS } from "./labels";
 
 const dateFormat = new Intl.DateTimeFormat("pl-PL", {
   timeZone: "Europe/Warsaw",
@@ -27,7 +25,7 @@ function Paragraphs({ text }: { text: string }) {
 }
 
 export function ItemDetail({ item, media }: { item: Item; media: Media | null }) {
-  const heading = item.title ?? item.url ?? (item.storage_path ? uploadFilename(item.storage_path) : item.id);
+  const heading = itemLabel(item);
   return (
     <article className="item">
       <p>
@@ -86,11 +84,11 @@ export function ItemDetail({ item, media }: { item: Item; media: Media | null })
         </section>
       )}
       {item.status === "failed" && (
-        <p className="error">
+        <p className="failed">
           Nie udało się odczytać: <code>{item.error}</code>
         </p>
       )}
-      {item.status === "pending" && <p className="notice">Opis jeszcze powstaje.</p>}
+      {item.status === "pending" && <p className="notice">Podsumowanie jeszcze powstaje.</p>}
 
       <form method="post" action={`/items/${item.id}/delete`} className="danger">
         <button type="submit">Usuń</button>

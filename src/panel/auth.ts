@@ -62,6 +62,12 @@ export function supabaseForRoute(request: NextRequest) {
 export async function ownerOr401(
   request: NextRequest,
 ): Promise<{ refused: Response } | { refused?: undefined; redirectTo: (path: string) => NextResponse }> {
+  // The session lives in a cookie, so a form posted from another site must not count. Browsers send
+  // Origin on every POST; when it is there it has to be the Panel itself.
+  const origin = request.headers.get("origin");
+  if (origin && origin !== new URL(env.panelUrl).origin) {
+    return { refused: new Response("Forbidden", { status: 403 }) };
+  }
   const { supabase, redirectTo } = supabaseForRoute(request);
   const access = await accessOf(supabase);
   if (access.access !== "owner") return { refused: new Response("Unauthorized", { status: 401 }) };

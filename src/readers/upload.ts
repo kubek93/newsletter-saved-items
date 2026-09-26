@@ -1,9 +1,7 @@
 import { isVideoMimeType, uploadFilename } from "@/domain/upload-item";
-import { uploadsBucket } from "@/lib/uploads";
+import { signedUploadUrl, uploadsBucket } from "@/lib/uploads";
 import type { Reader } from "./types";
 import { MAX_INLINE_VIDEO_BYTES, videoTooLarge } from "./video";
-
-const SIGNED_URL_SECONDS = 60 * 60;
 
 /**
  * Reads a photo or video the Owner uploaded. A photo reaches the model by a short-lived signed URL;
@@ -27,10 +25,8 @@ export const readUpload: Reader = async (item) => {
     ];
   }
 
-  const { data, error } = await uploadsBucket().createSignedUrl(path, SIGNED_URL_SECONDS);
-  if (error) throw new Error(`Storage signed URL failed: ${error.message}`);
   return [
     { type: "text", text: `Zdjęcie z urządzenia (${filename})` },
-    { type: "image", url: data.signedUrl },
+    { type: "image", url: await signedUploadUrl(path) },
   ];
 };

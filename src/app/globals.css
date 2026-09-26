@@ -179,7 +179,7 @@ form.inline {
   color: var(--muted);
 }
 
-.error code {
+p.failed code {
   color: #b3261e;
 }
 

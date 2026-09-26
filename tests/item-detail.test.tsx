@@ -2,11 +2,12 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it } from "vitest";
 import { POST as postCategory } from "@/app/items/[id]/category/route";
 import { POST as postDelete } from "@/app/items/[id]/delete/route";
+import { CATEGORIES } from "@/domain/category";
 import { newUploadItem } from "@/domain/upload-item";
 import { supabaseAdmin } from "@/lib/supabase";
 import { uploadsBucket } from "@/lib/uploads";
 import { ItemDetail } from "@/panel/ItemDetail";
-import { loadItem, mediaFor } from "@/panel/item-actions";
+import { loadItem, mediaFor } from "@/panel/items";
 import { allItems, clearItems, getItem, insertLinkItem } from "./items";
 import { formRequest, sessionCookiesFor } from "./session";
 
@@ -22,7 +23,9 @@ async function insertUpload(path: string, mimeType: "image/jpeg" | "video/mp4", 
   return data.id as string;
 }
 
-async function postForm(handler: typeof postCategory, path: string, fields: Record<string, string>, cookies = sessionCookiesFor(OWNER)) {
+type FormHandler = (request: import("next/server").NextRequest, context: { params: Promise<{ id: string }> }) => Promise<Response>;
+
+async function postForm(handler: FormHandler, path: string, fields: Record<string, string>, cookies = sessionCookiesFor(OWNER)) {
   const id = path.split("/")[2];
   return handler(formRequest(path, fields, await cookies), { params: Promise.resolve({ id }) });
 }
@@ -52,7 +55,7 @@ describe("ItemDetail", () => {
 
     const html = renderToStaticMarkup(<ItemDetail item={item} media={null} />);
 
-    expect(html.match(/<option value="[^"]+">/g)).toHaveLength(9);
+    expect(html.match(/<option value="[^"]+"/g)).toHaveLength(CATEGORIES.length);
     expect(html).toContain('action="/items/' + id + '/category"');
   });
 
@@ -92,14 +95,37 @@ describe("ItemDetail", () => {
 describe("POST /items/[id]/category", () => {
   beforeEach(clearItems);
 
-  it("stores the Owner's Category and returns to the Item page", async () => {
+  it("stores the Owner's Category, returns to the Item page, which then shows the new value", async () => {
     const id = await insertLinkItem("https://example.com/a", DONE);
 
     const res = await postForm(postCategory, `/items/${id}/category`, { category: "Jedzenie" });
 
     expect(res.status).toBe(303);
     expect(res.headers.get("location")).toBe(`${process.env.PANEL_URL}/items/${id}`);
-    expect((await getItem(id)).category).toBe("Jedzenie");
+    const item = (await loadItem(id))!;
+    expect(item.category).toBe("Jedzenie");
+    const html = renderToStaticMarkup(<ItemDetail item={item} media={null} />);
+    expect(html).toContain('<option value="Jedzenie" selected="">Jedzenie</option>');
+    expect(html).not.toContain('<option value="Ceramika" selected="">');
+  });
+
+  it("refuses a form posted from another site", async () => {
+    const id = await insertLinkItem("https://example.com/a", DONE);
+    const request = formRequest(`/items/${id}/category`, { category: "AI" }, await sessionCookiesFor(OWNER));
+    request.headers.set("origin", "https://evil.example");
+
+    const res = await postCategory(request, { params: Promise.resolve({ id }) });
+
+    expect(res.status).toBe(403);
+    expect((await getItem(id)).category).toBe("Ceramika");
+  });
+
+  it("accepts a form posted from the Panel itself", async () => {
+    const id = await insertLinkItem("https://example.com/a", DONE);
+    const request = formRequest(`/items/${id}/category`, { category: "AI" }, await sessionCookiesFor(OWNER));
+    request.headers.set("origin", new URL(process.env.PANEL_URL!).origin);
+
+    expect((await postCategory(request, { params: Promise.resolve({ id }) })).status).toBe(303);
   });
 
   it("refuses a Category outside the list", async () => {

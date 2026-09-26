@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { requireOwner } from "@/panel/auth";
 import { ItemDetail } from "@/panel/ItemDetail";
-import { loadItem, mediaFor } from "@/panel/item-actions";
+import { loadItem, mediaFor } from "@/panel/items";
 
 export default async function ItemPage({ params }: { params: Promise<{ id: string }> }) {
   await requireOwner();
