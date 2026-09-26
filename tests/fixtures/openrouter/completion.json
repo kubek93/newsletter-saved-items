@@ -1,0 +1,26 @@
+{
+  "id": "gen-1758900000-abc123",
+  "provider": "Google AI Studio",
+  "model": "google/gemini-2.5-flash",
+  "object": "chat.completion",
+  "created": 1758900000,
+  "choices": [
+    {
+      "logprobs": null,
+      "finish_reason": "stop",
+      "native_finish_reason": "STOP",
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "{}",
+        "refusal": null,
+        "reasoning": null
+      }
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 412,
+    "completion_tokens": 96,
+    "total_tokens": 508
+  }
+}

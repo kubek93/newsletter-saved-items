@@ -1,8 +1,10 @@
 import { digestDayFor } from "@/domain/digest-day";
 import { detectSource } from "@/domain/source";
 import { normalizeUrl } from "@/domain/url";
+import { afterResponse } from "@/lib/after-response";
 import { isAuthorized } from "@/lib/ingest-auth";
 import { supabaseAdmin } from "@/lib/supabase";
+import { processItem } from "@/processing";
 
 const UNIQUE_VIOLATION = "23505";
 
@@ -46,7 +48,9 @@ export async function POST(request: Request) {
     .single();
 
   if (!inserted.error) {
-    return Response.json({ status: "created", id: inserted.data.id }, { status: 201 });
+    const id: string = inserted.data.id;
+    afterResponse(() => processItem(id));
+    return Response.json({ status: "created", id }, { status: 201 });
   }
   if (inserted.error.code !== UNIQUE_VIOLATION) {
     throw inserted.error;
