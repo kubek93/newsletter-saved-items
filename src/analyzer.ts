@@ -54,8 +54,12 @@ function asSummary(raw: string): Summary {
   return { title, description, recap, category: toCategory(category) };
 }
 
+/** Only Google AI Studio takes a video by URL (and only a YouTube one), so video parts pin the provider. */
+const VIDEO_PROVIDER = { only: ["google-ai-studio"] };
+
 /** Asks the configured model, through OpenRouter, for a Polish Summary and a Category of the content parts. */
 export async function analyze(parts: ContentPart[]): Promise<Summary> {
+  const hasVideo = parts.some((part) => part.type === "video");
   const res = await fetch(OPENROUTER_API, {
     method: "POST",
     headers: {
@@ -69,6 +73,7 @@ export async function analyze(parts: ContentPart[]): Promise<Summary> {
         { role: "user", content: parts.map(toMessagePart) },
       ],
       response_format: RESPONSE_SCHEMA,
+      ...(hasVideo ? { provider: VIDEO_PROVIDER } : {}),
     }),
   });
   if (!res.ok) throw new Error(`OpenRouter ${res.status}: ${(await res.text()).slice(0, 500)}`);

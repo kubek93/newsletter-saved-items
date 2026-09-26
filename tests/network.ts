@@ -26,6 +26,12 @@ export function fxtwitterAnswers(name: "text-only" | "with-photo" | "not-found")
   return http.get("https://api.fxtwitter.com/*", () => HttpResponse.json(body, { status: body.code }));
 }
 
+/** Jina Reader answers every page fetch with the named recorded response. */
+export function jinaAnswers(name: "page" | "not-found" | "unresolvable") {
+  const body = fixture(`jina/${name}.json`) as { code: number };
+  return http.get("https://r.jina.ai/*", () => HttpResponse.json(body, { status: body.code }));
+}
+
 export type OpenRouterOptions = {
   /** What the model "answers"; serialised into the assistant message. Non-object values are sent as-is. */
   reply?: unknown;
@@ -39,6 +45,7 @@ export type OpenRouterRequest = {
   model: string;
   messages: { role: string; content: string | { type: string; [key: string]: unknown }[] }[];
   response_format?: unknown;
+  provider?: unknown;
 };
 
 export const SAMPLE_REPLY = {

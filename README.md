@@ -12,7 +12,7 @@ supabase start          # local Postgres, Auth and REST on ports 553xx (see supa
 cp .env.example .env.local
 ```
 
-Fill `.env.local` with `SUPABASE_SERVICE_ROLE_KEY` from `supabase status -o env`, pick any value for `INGEST_TOKEN`, and set `OPENROUTER_API_KEY` (the model id in `OPENROUTER_MODEL` can stay as in the example). Then:
+Fill `.env.local` with `SUPABASE_SERVICE_ROLE_KEY` from `supabase status -o env`, pick any value for `INGEST_TOKEN`, and set `OPENROUTER_API_KEY` (the model id in `OPENROUTER_MODEL` can stay as in the example) and `JINA_API_KEY` (free, from jina.ai). Then:
 
 ```
 pnpm dev
@@ -27,7 +27,7 @@ curl -X POST http://localhost:3000/api/ingest/link \
   -d '{"url":"https://x.com/someone/status/123"}'
 ```
 
-The response is `{"status":"created","id":"..."}` the first time and `{"status":"duplicate","id":"..."}` afterwards. A created Item is analysed in the background: its Source is read (X posts through FxTwitter), the content goes to the model configured in `OPENROUTER_MODEL`, and the row ends up `done` with a Polish title, description, recap and Category, or `failed` with the error text and one more attempt counted.
+The response is `{"status":"created","id":"..."}` the first time and `{"status":"duplicate","id":"..."}` afterwards. A created Item is analysed in the background: its Source is read (X posts through FxTwitter, web pages as text through Jina Reader, YouTube links straight to the model as video), the content goes to the model configured in `OPENROUTER_MODEL`, and the row ends up `done` with a Polish title, description, recap and Category, or `failed` with the error text and one more attempt counted.
 
 ## Tests
 
@@ -40,6 +40,6 @@ pnpm typecheck
 pnpm lint
 ```
 
-HTTP tests call the route handlers directly with a `Request` and assert on the response and on rows in the local database. Every outbound call (FxTwitter, OpenRouter) is intercepted by `msw` with recorded fixtures under `tests/fixtures`; an unexpected external request is rejected instead of reaching the network. Pure functions (URL normalisation, Source detection, Digest Day, Category) have table-driven unit tests next to their source.
+HTTP tests call the route handlers directly with a `Request` and assert on the response and on rows in the local database. Every outbound call (FxTwitter, Jina Reader, OpenRouter) is intercepted by `msw` with recorded fixtures under `tests/fixtures`; an unexpected external request is rejected instead of reaching the network. Pure functions (URL normalisation, Source detection, Digest Day, Category) have table-driven unit tests next to their source.
 
 After changing a migration: `supabase db reset`.

@@ -1,0 +1,72 @@
+{
+  "code": 200,
+  "status": 20000,
+  "data": {
+    "title": "Ceramic glaze",
+    "description": "",
+    "url": "https://en.wikipedia.org/wiki/Ceramic_glaze",
+    "content": "Composite body, painted, and glazed bottle. [Iran](https://en.wikipedia.org/wiki/Iran \"Iran\"), 16th century ([Metropolitan Museum of Art](https://en.wikipedia.org/wiki/Metropolitan_Museum_of_Art \"Metropolitan Museum of Art\"))\n\nDetail of dripping rice-straw [ash glaze](https://en.wikipedia.org/wiki/Ash_glaze \"Ash glaze\") (top), Japan, 1852\n\n**Ceramic glaze**, or simply **glaze**, is a [glassy](https://en.wikipedia.org/wiki/Glass \"Glass\") coating on ceramics. It is used for decoration, to ensure the item is impermeable to liquids and to minimize the adherence of pollutants.[[1]](https://en.wikipedia.org/wiki/Ceramic_glaze#cite_note-Division-1)\n\nGlazing renders [earthenware](https://en.wikipedia.org/wiki/Earthenware \"Earthenware\") impermeable to water, sealing the inherent [porosity](https://en.wikipedia.org/wiki/Porosity \"Porosity\") of earthenware. It also gives a tougher surface. Glaze is also used on [stoneware](https://en.wikipedia.org/wiki/Stoneware \"Stoneware\") and [porcelain](https://en.wikipedia.org/wiki/Porcelain \"Porcelain\"). In addition to their functionality, glazes can form a variety of surface finishes, including degrees of glossy or matte finish and color. Glazes may also enhance the underlying design or texture either unmodified or inscribed, carved or painted.",
+    "publishedTime": "2006-08-27T13:48:40Z",
+    "metadata": {
+      "lang": "en",
+      "ResourceLoaderDynamicStyles": "",
+      "generator": "MediaWiki 1.47.0-wmf.20",
+      "referrer": [
+        "origin",
+        "origin-when-cross-origin"
+      ],
+      "robots": "max-image-preview:standard",
+      "format-detection": "telephone=no",
+      "og:image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/de/Eiraku_Wazen_-_Flared_Vase_with_Dripping_Glaze_-_Walters_491582_-_Mark_A.jpg/1280px-Eiraku_Wazen_-_Flared_Vase_with_Dripping_Glaze_-_Walters_491582_-_Mark_A.jpg?utm_source=en.wikipedia.org&utm_campaign=index&utm_content=thumbnail",
+      "og:image:width": "1200",
+      "og:image:height": "731",
+      "viewport": "width=1120",
+      "og:title": "Ceramic glaze - Wikipedia",
+      "og:type": "website"
+    },
+    "external": {
+      "preconnect": {
+        "https://thumb.wikimedia.org/": {}
+      },
+      "alternate": {
+        "https://en.wikipedia.org/w/index.php?title=Ceramic_glaze&action=edit": {
+          "type": "application/x-wiki",
+          "title": "Edit this page"
+        },
+        "https://en.wikipedia.org/w/index.php?title=Special:RecentChanges&feed=atom": {
+          "type": "application/atom+xml",
+          "title": "Wikipedia Atom feed"
+        }
+      },
+      "apple-touch-icon": {
+        "https://en.wikipedia.org/static/apple-touch/wikipedia.png": {}
+      },
+      "icon": {
+        "https://en.wikipedia.org/static/favicon/wikipedia.ico": {}
+      },
+      "search": {
+        "https://en.wikipedia.org/w/rest.php/v1/search": {
+          "type": "application/opensearchdescription+xml",
+          "title": "Wikipedia (en)"
+        }
+      },
+      "EditURI": {
+        "https://en.wikipedia.org/w/api.php?action=rsd": {
+          "type": "application/rsd+xml"
+        }
+      },
+      "canonical": {
+        "https://en.wikipedia.org/wiki/Ceramic_glaze": {}
+      },
+      "license": {
+        "https://creativecommons.org/licenses/by-sa/4.0/deed.en": {}
+      },
+      "dns-prefetch": {
+        "https://meta.wikimedia.org/": {},
+        "https://en.wikipedia.org/wiki/auth.wikimedia.org": {}
+      }
+    },
+    "httpStatus": 200,
+    "httpStatusText": ""
+  }
+}

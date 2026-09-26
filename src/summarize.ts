@@ -2,10 +2,12 @@ import { analyze } from "@/analyzer";
 import type { Item, Source } from "@/domain/item";
 import { supabaseAdmin } from "@/lib/supabase";
 import type { Reader } from "@/readers/types";
+import { readWeb } from "@/readers/web";
 import { readX } from "@/readers/x";
 
 const READERS: Partial<Record<Source, Reader>> = {
   x: readX,
+  web: readWeb,
 };
 
 /** Whether Items from this Source can be read at all yet. */
