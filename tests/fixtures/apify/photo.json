@@ -1,0 +1,28 @@
+[
+  {
+    "inputUrl": "https://www.instagram.com/p/C1abcDEfGh/",
+    "id": "3260123456789012345",
+    "type": "Image",
+    "shortCode": "C1abcDEfGh",
+    "caption": "Nowa seria misek z glazurą popiołową. Wypał w 1250°C, 14 godzin. #ceramika #ceramics",
+    "hashtags": ["ceramika", "ceramics"],
+    "mentions": [],
+    "url": "https://www.instagram.com/p/C1abcDEfGh/",
+    "commentsCount": 12,
+    "firstComment": "",
+    "latestComments": [],
+    "dimensionsHeight": 1350,
+    "dimensionsWidth": 1080,
+    "displayUrl": "https://scontent-waw2-1.cdninstagram.com/v/t51.2885-15/456789012_1234567890_n.jpg",
+    "images": ["https://scontent-waw2-1.cdninstagram.com/v/t51.2885-15/456789012_1234567890_n.jpg"],
+    "alt": "Photo by Jane Potter on September 20, 2026.",
+    "likesCount": 143,
+    "timestamp": "2026-09-20T10:12:33.000Z",
+    "childPosts": [],
+    "ownerFullName": "Jane Potter",
+    "ownerUsername": "janepotter",
+    "ownerId": "123456789",
+    "productType": "feed",
+    "isSponsored": false
+  }
+]

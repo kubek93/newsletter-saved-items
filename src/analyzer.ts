@@ -40,8 +40,13 @@ function toMessagePart(part: ContentPart) {
       return { type: "text", text: part.text };
     case "image":
       return { type: "image_url", image_url: { url: part.url } };
-    case "video":
+    case "youtube":
       return { type: "video_url", video_url: { url: part.url } };
+    case "video":
+      return {
+        type: "video_url",
+        video_url: { url: `data:${part.mimeType};base64,${Buffer.from(part.bytes).toString("base64")}` },
+      };
   }
 }
 
@@ -54,12 +59,12 @@ function asSummary(raw: string): Summary {
   return { title, description, recap, category: toCategory(category) };
 }
 
-/** Only Google AI Studio takes a video by URL (and only a YouTube one), so video parts pin the provider. */
+/** Only Google AI Studio takes a video by URL (and only a YouTube one), so any video pins the provider. */
 const VIDEO_PROVIDER = { only: ["google-ai-studio"] };
 
 /** Asks the configured model, through OpenRouter, for a Polish Summary and a Category of the content parts. */
 export async function analyze(parts: ContentPart[]): Promise<Summary> {
-  const hasVideo = parts.some((part) => part.type === "video");
+  const hasVideo = parts.some((part) => part.type === "video" || part.type === "youtube");
   const res = await fetch(OPENROUTER_API, {
     method: "POST",
     headers: {

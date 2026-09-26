@@ -1,3 +1,4 @@
+import { digestDayFor } from "@/domain/digest-day";
 import { newLinkItem } from "@/domain/link-item";
 import { supabaseAdmin } from "@/lib/supabase";
 import { hasReader } from "@/summarize";
@@ -22,6 +23,24 @@ export async function getItem(id: string) {
 /** A Pending link Item written straight to the table, for tests that exercise the job rather than ingest. */
 export async function insertPendingLink(url: string): Promise<string> {
   const { data, error } = await supabaseAdmin.from("items").insert(newLinkItem(url)).select("id").single();
+  if (error) throw error;
+  return data.id;
+}
+
+/** A Pending Upload Item written straight to the table. */
+export async function insertPendingUpload(storagePath: string, mimeType: string): Promise<string> {
+  const savedAt = new Date();
+  const { data, error } = await supabaseAdmin
+    .from("items")
+    .insert({
+      source: "upload",
+      storage_path: storagePath,
+      mime_type: mimeType,
+      saved_at: savedAt.toISOString(),
+      digest_day: digestDayFor(savedAt),
+    })
+    .select("id")
+    .single();
   if (error) throw error;
   return data.id;
 }

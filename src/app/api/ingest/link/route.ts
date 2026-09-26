@@ -6,6 +6,9 @@ import { summarizeItem } from "@/summarize";
 
 const UNIQUE_VIOLATION = "23505";
 
+/** The Summary is written after the response, in the same invocation; an Apify run alone can take a minute. */
+export const maxDuration = 300;
+
 async function readUrl(request: Request): Promise<string | null> {
   try {
     const body: unknown = await request.json();

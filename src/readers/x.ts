@@ -8,11 +8,14 @@ type FxTwitterResponse = {
   tweet: {
     text: string;
     author: { name: string; screen_name: string };
-    media?: { all?: { type: "photo" | "video" | "gif"; url: string }[] };
+    media?: { all?: { type: "photo" | "video" | "gif"; url: string; thumbnail_url?: string }[] };
   } | null;
 };
 
-/** Reads an X post through the FxTwitter public API: text, author and media. No auth. */
+/**
+ * Reads an X post through the FxTwitter public API: text, author and media. No auth.
+ * A video is represented by its thumbnail for now; sending the file itself is a later step (ADR 0005).
+ */
 export const readX: Reader = async (item) => {
   const match = /\/status\/(\d+)/.exec(item.url ?? "");
   if (!match) throw new Error(`Not an X post URL: ${item.url}`);
@@ -24,9 +27,13 @@ export const readX: Reader = async (item) => {
   }
 
   const { text, author, media } = body.tweet;
-  const parts: ContentPart[] = [{ type: "text", text: `@${author.screen_name} (${author.name}):\n${text}` }];
-  for (const attachment of media?.all ?? []) {
-    parts.push(attachment.type === "photo" ? { type: "image", url: attachment.url } : { type: "video", url: attachment.url });
+  const attachments = media?.all ?? [];
+  const hasVideo = attachments.some((attachment) => attachment.type !== "photo");
+  const note = hasVideo ? "\n(post zawiera wideo; poniżej jego kadr)" : "";
+  const parts: ContentPart[] = [{ type: "text", text: `@${author.screen_name} (${author.name}):\n${text}${note}` }];
+  for (const attachment of attachments) {
+    const url = attachment.type === "photo" ? attachment.url : attachment.thumbnail_url;
+    if (url) parts.push({ type: "image", url });
   }
   return parts;
 };

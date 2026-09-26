@@ -13,6 +13,6 @@ export const readYouTube: Reader = async (item) => {
   const url = item.url!;
   return [
     { type: "text", text: `Film z YouTube: ${url}` },
-    { type: "video", url },
+    { type: "youtube", url },
   ];
 };

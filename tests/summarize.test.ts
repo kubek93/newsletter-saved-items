@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { summarizeItem } from "@/summarize";
-import { clearItems, getItem, insertPendingLink } from "./items";
+import { clearItems, getItem, insertPendingLink, insertPendingUpload } from "./items";
 import { fxtwitterAnswers, network, openrouterAnswers, SAMPLE_REPLY, type OpenRouterRequest } from "./network";
 
 const X_POST = "https://x.com/jack/status/20";
@@ -98,8 +98,22 @@ describe("summarizeItem", () => {
     expect(await getItem(id)).toMatchObject({ status: "failed", attempts: 2 });
   });
 
+  it("sends the thumbnail of a post's video and tells the model there is a video", async () => {
+    const requests: OpenRouterRequest[] = [];
+    network.use(fxtwitterAnswers("with-video"), openrouterAnswers({ onRequest: (body) => requests.push(body) }));
+    const id = await insertPendingLink("https://x.com/NASA/status/1900000000000000001");
+
+    await summarizeItem(id);
+
+    expect((await getItem(id)).status).toBe("done");
+    const userContent = requests[0].messages.find((m) => m.role === "user")!.content as { type: string }[];
+    expect(userContent.map((part) => part.type)).toEqual(["text", "image_url"]);
+    expect(JSON.stringify(userContent[0])).toContain("zawiera wideo");
+    expect(JSON.stringify(userContent[1])).toContain("amplify_video_thumb");
+  });
+
   it("leaves an Item Pending when its Source has no reader yet", async () => {
-    const id = await insertPendingLink("https://www.instagram.com/p/abc/");
+    const id = await insertPendingUpload("uploads/photo.jpg", "image/jpeg");
 
     await summarizeItem(id);
 
