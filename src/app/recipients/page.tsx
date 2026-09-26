@@ -1,8 +1,6 @@
 import { requireOwner } from "@/panel/auth";
 import { RecipientList } from "@/panel/RecipientList";
-import { listRecipients, type AddOutcome } from "@/panel/recipients";
-
-const OUTCOMES: AddOutcome[] = ["added", "malformed", "duplicate"];
+import { isAddOutcome, listRecipients } from "@/panel/recipients";
 
 export default async function RecipientsPage({
   searchParams,
@@ -11,7 +9,7 @@ export default async function RecipientsPage({
 }) {
   await requireOwner();
   const params = await searchParams;
-  const outcome = OUTCOMES.find((candidate) => candidate === params.outcome) ?? null;
+  const outcome = isAddOutcome(params.outcome) ? params.outcome : null;
   const attempted = typeof params.email === "string" ? params.email : undefined;
   return (
     <main>

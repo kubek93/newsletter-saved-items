@@ -3,7 +3,12 @@ import { supabaseAdmin } from "@/lib/supabase";
 
 const UNIQUE_VIOLATION = "23505";
 
-export type AddOutcome = "added" | "malformed" | "duplicate";
+export const ADD_OUTCOMES = ["added", "malformed", "duplicate"] as const;
+export type AddOutcome = (typeof ADD_OUTCOMES)[number];
+
+export function isAddOutcome(value: unknown): value is AddOutcome {
+  return (ADD_OUTCOMES as readonly unknown[]).includes(value);
+}
 
 /** Every Recipient, in the order they were added. */
 export async function listRecipients(): Promise<Recipient[]> {

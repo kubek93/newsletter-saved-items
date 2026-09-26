@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { Recipient } from "@/domain/recipient";
 import type { AddOutcome } from "./recipients";
 
-export const OUTCOME_MESSAGES: Record<AddOutcome, string> = {
+const OUTCOME_MESSAGES: Record<AddOutcome, string> = {
   added: "Dodano. Następny Digest trafi także na ten adres.",
   malformed: "To nie wygląda na adres e-mail.",
   duplicate: "Ten adres już dostaje Digest.",
@@ -21,7 +21,7 @@ export function RecipientList({ recipients, outcome, attempted }: { recipients: 
       <form method="post" action="/recipients/add" className="filters">
         <label>
           Adres e-mail
-          <input type="email" name="email" required defaultValue={outcome && outcome !== "added" ? attempted : ""} />
+          <input type="email" name="email" required defaultValue={attempted ?? ""} />
         </label>
         <button type="submit">Dodaj</button>
       </form>

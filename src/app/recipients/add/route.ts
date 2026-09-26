@@ -7,9 +7,9 @@ export async function POST(request: NextRequest) {
   const owner = await ownerOr401(request);
   if (owner.refused) return owner.refused;
 
-  const email = (await request.formData()).get("email");
-  const outcome = await addRecipient(typeof email === "string" ? email : "");
+  const email = String((await request.formData()).get("email") ?? "");
+  const outcome = await addRecipient(email);
   const query = new URLSearchParams({ outcome });
-  if (outcome !== "added" && typeof email === "string") query.set("email", email);
+  if (outcome !== "added") query.set("email", email); // back into the field, to be corrected
   return owner.redirectTo(`/recipients?${query}`);
 }

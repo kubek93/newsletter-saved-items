@@ -88,6 +88,15 @@ describe("POST /recipients/add", () => {
     expect(await listRecipients()).toHaveLength(1);
   });
 
+  it("rejects a duplicate of an address that was added by SQL in another spelling", async () => {
+    await supabaseAdmin.from("recipients").insert({ email: "Ania@Example.com" });
+
+    const res = await add("ania@example.com");
+
+    expect(res.headers.get("location")).toContain("outcome=duplicate");
+    expect(await listRecipients()).toHaveLength(1);
+  });
+
   it("refuses anyone but the Owner", async () => {
     expect((await add("ania@example.com", Promise.resolve([]))).status).toBe(401);
     expect((await add("ania@example.com", sessionCookiesFor("stranger@example.com"))).status).toBe(401);
@@ -127,6 +136,27 @@ describe("POST /recipients/[id]/delete", () => {
     expect(await listRecipients()).toEqual([]);
   });
 
+  it("stops the Digest for the removed address", async () => {
+    await clearItems();
+    const sentTo: string[] = [];
+    network.use(
+      http.post("https://api.resend.com/emails", async ({ request }) => {
+        sentTo.push(((await request.json()) as { to: string[] }).to[0]);
+        return HttpResponse.json({ id: "email_1" });
+      }),
+    );
+    await addRecipient("zostaje@example.com");
+    await addRecipient("odchodzi@example.com");
+    const leaving = (await listRecipients()).find((r) => r.email === "odchodzi@example.com")!;
+
+    await postDelete(formRequest(`/recipients/${leaving.id}/delete`, {}, await sessionCookiesFor(OWNER)), {
+      params: Promise.resolve({ id: leaving.id }),
+    });
+    await sendDigest(new Date("2026-09-26T05:00:10Z"));
+
+    expect(sentTo).toEqual(["zostaje@example.com"]);
+  });
+
   it("answers 404 for an address that is already gone", async () => {
     await addRecipient("ania@example.com");
     const [{ id }] = await listRecipients();
@@ -143,9 +173,14 @@ describe("POST /recipients/[id]/delete", () => {
     await addRecipient("ania@example.com");
     const [{ id }] = await listRecipients();
 
-    const res = await postDelete(formRequest(`/recipients/${id}/delete`, {}), { params: Promise.resolve({ id }) });
+    const anonymous = await postDelete(formRequest(`/recipients/${id}/delete`, {}), { params: Promise.resolve({ id }) });
+    const stranger = await postDelete(
+      formRequest(`/recipients/${id}/delete`, {}, await sessionCookiesFor("stranger@example.com")),
+      { params: Promise.resolve({ id }) },
+    );
 
-    expect(res.status).toBe(401);
+    expect(anonymous.status).toBe(401);
+    expect(stranger.status).toBe(401);
     expect(await listRecipients()).toHaveLength(1);
   });
 });
