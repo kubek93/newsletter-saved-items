@@ -26,6 +26,12 @@ export function fxtwitterAnswers(name: "text-only" | "with-photo" | "not-found")
   return http.get("https://api.fxtwitter.com/*", () => HttpResponse.json(body, { status: body.code }));
 }
 
+/** Jina Reader answers every page fetch with the named recorded response. */
+export function jinaAnswers(name: "page" | "not-found" | "unresolvable") {
+  const body = fixture(`jina/${name}.json`) as { code: number };
+  return http.get("https://r.jina.ai/*", () => HttpResponse.json(body, { status: body.code }));
+}
+
 export type OpenRouterOptions = {
   /** What the model "answers"; serialised into the assistant message. Non-object values are sent as-is. */
   reply?: unknown;
@@ -39,7 +45,18 @@ export type OpenRouterRequest = {
   model: string;
   messages: { role: string; content: string | { type: string; [key: string]: unknown }[] }[];
   response_format?: unknown;
+  provider?: unknown;
 };
+
+/** OpenRouter answers normally and every request body lands in `requests`, for asserting on what the model was asked. */
+export function openrouterCaptures(requests: OpenRouterRequest[]) {
+  return openrouterAnswers({ onRequest: (body) => requests.push(body) });
+}
+
+/** The user message's content parts of a captured request. */
+export function userContent(request: OpenRouterRequest) {
+  return request.messages.find((m) => m.role === "user")!.content as { type: string; [key: string]: unknown }[];
+}
 
 export const SAMPLE_REPLY = {
   title: "Pierwszy tweet w historii",

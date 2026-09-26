@@ -10,4 +10,5 @@ export const env = {
   ingestToken: required("INGEST_TOKEN"),
   openrouterApiKey: required("OPENROUTER_API_KEY"),
   openrouterModel: required("OPENROUTER_MODEL"),
+  jinaApiKey: required("JINA_API_KEY"),
 };

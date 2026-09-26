@@ -1,0 +1,9 @@
+{
+  "data": null,
+  "path": "url",
+  "code": 422,
+  "name": "SubmittedDataMalformedError",
+  "status": 42203,
+  "message": "Domain 'no-such-host-zzz.invalid' could not be resolved",
+  "readableMessage": "SubmittedDataMalformedError: Domain 'no-such-host-zzz.invalid' could not be resolved"
+}

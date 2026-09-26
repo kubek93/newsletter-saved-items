@@ -99,7 +99,7 @@ describe("summarizeItem", () => {
   });
 
   it("leaves an Item Pending when its Source has no reader yet", async () => {
-    const id = await insertPendingLink("https://example.com/article");
+    const id = await insertPendingLink("https://www.instagram.com/p/abc/");
 
     await summarizeItem(id);
 
