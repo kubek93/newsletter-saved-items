@@ -45,6 +45,14 @@ curl -X POST http://localhost:3000/api/ingest/upload -H "Authorization: Bearer $
 
 Accepted types: JPEG, PNG, WebP, MP4, QuickTime; the Shortcut converts HEIC to JPEG first. Uploads are never deduplicated. A video above about 15 MB cannot be analysed (ADR 0005) and ends Failed. A created Item is analysed in the background: its Source is read (X posts through FxTwitter, Instagram posts and Reels through an Apify actor, web pages as text through Jina Reader, YouTube links straight to the model as video; other videos are downloaded and sent inline, see ADR 0005), the content goes to the model configured in `OPENROUTER_MODEL`, and the row ends up `done` with a Polish title, description, recap and Category, or `failed` with the error text and one more attempt counted.
 
+## Panel
+
+Server-rendered pages at `/`, behind Google sign-in through Supabase Auth. Only the account in `OWNER_EMAIL` gets in; any other Google account is signed out again with a message. `src/proxy.ts` refreshes the session cookies on every request and sends anonymous visitors to `/login`; each page then checks the allowlist with `requireOwner()`. Data is read with the service role after that check, so no RLS policies are needed for the Panel.
+
+Google provider setup (once, in the Supabase dashboard): Authentication → Providers → Google, with a Google Cloud OAuth client whose authorised redirect URI is `https://<project-ref>.supabase.co/auth/v1/callback`. Add `PANEL_URL/auth/callback` to the allowed redirect URLs. Locally the same is done in `supabase/config.toml` (`[auth.external.google]`) with `SUPABASE_AUTH_GOOGLE_CLIENT_ID` and `SUPABASE_AUTH_GOOGLE_SECRET`; `SUPABASE_ANON_KEY` comes from `supabase status -o env`.
+
+The Item list is filtered by Category and by Digest Day range through the query string (`/?category=Ceramika&from=2026-09-01&to=2026-09-30`).
+
 ## Cron jobs
 
 Declared in `vercel.json`, invoked by Vercel Cron with `CRON_SECRET` as a bearer token. Vercel schedules run in UTC, so each job is scheduled at the two UTC hours that can be its Warsaw hour and the route only acts when the Europe/Warsaw clock matches:
