@@ -22,9 +22,11 @@ export async function POST(request: Request) {
   }
 
   const url = await readUrl(request);
+  if (url === null) {
+    return Response.json({ error: "missing url" }, { status: 400 });
+  }
   let normalizedUrl: string;
   try {
-    if (url === null) throw new Error("missing url");
     normalizedUrl = normalizeUrl(url);
   } catch {
     return Response.json({ error: "invalid url" }, { status: 400 });

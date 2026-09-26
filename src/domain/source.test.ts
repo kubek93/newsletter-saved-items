@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { detectSource } from "./source";
+import { normalizeUrl } from "./url";
 
 describe("detectSource", () => {
   it.each([
@@ -13,6 +14,6 @@ describe("detectSource", () => {
     ["https://example.com/article", "web"],
     ["https://notx.com/user/status/1", "web"],
   ] as const)("%s → %s", (url, expected) => {
-    expect(detectSource(url)).toBe(expected);
+    expect(detectSource(normalizeUrl(url))).toBe(expected);
   });
 });

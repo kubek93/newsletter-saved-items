@@ -15,7 +15,8 @@ describe("normalizeUrl", () => {
     ["keeps non-tracking parameters in their order", "https://example.com/a?b=2&a=1", "https://example.com/a?b=2&a=1"],
     ["strips the fragment", "https://example.com/a#section", "https://example.com/a"],
     ["keeps youtu.be untouched apart from tracking", "https://youtu.be/abc?si=track", "https://youtu.be/abc"],
-    ["keeps the YouTube video id parameter", "https://www.youtube.com/watch?v=abc&feature=share", "https://www.youtube.com/watch?v=abc"],
+    ["keeps the YouTube video id parameter", "https://www.youtube.com/watch?v=abc&si=share", "https://www.youtube.com/watch?v=abc"],
+    ["keeps parameters that may carry meaning, such as ref", "https://example.com/a?ref=homepage", "https://example.com/a?ref=homepage"],
   ])("%s", (_name, input, expected) => {
     expect(normalizeUrl(input)).toBe(expected);
   });

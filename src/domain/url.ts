@@ -1,4 +1,6 @@
-const TRACKING_PARAMS = new Set(["s", "t", "igsh", "igshid", "si", "feature", "fbclid", "gclid", "ref", "ref_src"]);
+// X (s, t), Instagram (igsh, igshid), YouTube (si), Meta/Google click ids. Kept narrow: a real
+// query parameter stripped by mistake would make two different pages look like one.
+const TRACKING_PARAMS = new Set(["s", "t", "igsh", "igshid", "si", "fbclid", "gclid"]);
 
 const HOST_ALIASES: Record<string, string> = {
   "twitter.com": "x.com",

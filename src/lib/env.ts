@@ -5,13 +5,7 @@ function required(name: string): string {
 }
 
 export const env = {
-  get supabaseUrl() {
-    return required("SUPABASE_URL");
-  },
-  get supabaseServiceRoleKey() {
-    return required("SUPABASE_SERVICE_ROLE_KEY");
-  },
-  get ingestToken() {
-    return required("INGEST_TOKEN");
-  },
+  supabaseUrl: required("SUPABASE_URL"),
+  supabaseServiceRoleKey: required("SUPABASE_SERVICE_ROLE_KEY"),
+  ingestToken: required("INGEST_TOKEN"),
 };
