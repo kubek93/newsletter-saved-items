@@ -27,11 +27,27 @@ curl -X POST http://localhost:3000/api/ingest/link \
   -d '{"url":"https://x.com/someone/status/123"}'
 ```
 
-The response is `{"status":"created","id":"..."}` the first time and `{"status":"duplicate","id":"..."}` afterwards. A created Item is analysed in the background: its Source is read (X posts through FxTwitter, Instagram posts and Reels through an Apify actor, web pages as text through Jina Reader, YouTube links straight to the model as video; other videos are downloaded and sent inline, see ADR 0005), the content goes to the model configured in `OPENROUTER_MODEL`, and the row ends up `done` with a Polish title, description, recap and Category, or `failed` with the error text and one more attempt counted.
+The response is `{"status":"created","id":"..."}` the first time and `{"status":"duplicate","id":"..."}` afterwards.
+
+Save a photo or video (what the Shortcut does in three calls; the file never passes through the app, ADR 0004):
+
+```
+# 1. ask for a signed upload URL
+curl -X POST http://localhost:3000/api/ingest/upload-url -H "Authorization: Bearer $INGEST_TOKEN" \
+  -H "Content-Type: application/json" -d '{"filename":"IMG_0001.jpg","mimeType":"image/jpeg"}'
+# → {"uploadUrl":"...","path":"2026/09/<uuid>-IMG_0001.jpg"}
+# 2. PUT the file there
+curl -X PUT "$uploadUrl" -H "Content-Type: image/jpeg" --data-binary @IMG_0001.jpg
+# 3. register the Item
+curl -X POST http://localhost:3000/api/ingest/upload -H "Authorization: Bearer $INGEST_TOKEN" \
+  -H "Content-Type: application/json" -d '{"path":"2026/09/<uuid>-IMG_0001.jpg","mimeType":"image/jpeg"}'
+```
+
+Accepted types: JPEG, PNG, WebP, MP4, QuickTime; the Shortcut converts HEIC to JPEG first. Uploads are never deduplicated. A video above about 15 MB cannot be analysed (ADR 0005) and ends Failed. A created Item is analysed in the background: its Source is read (X posts through FxTwitter, Instagram posts and Reels through an Apify actor, web pages as text through Jina Reader, YouTube links straight to the model as video; other videos are downloaded and sent inline, see ADR 0005), the content goes to the model configured in `OPENROUTER_MODEL`, and the row ends up `done` with a Polish title, description, recap and Category, or `failed` with the error text and one more attempt counted.
 
 ## Tests
 
-Tests need the local Supabase running (`supabase start`). They read `.env.test`, which points at the local instance with its demo keys.
+Tests need the local Supabase running (`supabase start`, with Storage; the `uploads` bucket comes from a migration). They read `.env.test`, which points at the local instance with its demo keys.
 
 ```
 pnpm test               # everything
