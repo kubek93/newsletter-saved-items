@@ -5,13 +5,16 @@ import { downloadVideo } from "./video";
 const APIFY_API = "https://api.apify.com/v2";
 
 type ApifyPost = {
-  type: "Image" | "Video" | "Sidecar";
+  type?: "Image" | "Video" | "Sidecar";
   caption?: string;
   ownerUsername?: string;
   ownerFullName?: string;
   displayUrl?: string;
   videoUrl?: string;
   childPosts?: { type: "Image" | "Video"; displayUrl?: string; videoUrl?: string }[];
+  /** Set instead of the post when Instagram would not show it (private, removed, login wall). */
+  error?: string;
+  errorDescription?: string;
 };
 
 async function mediaParts(post: ApifyPost): Promise<ContentPart[]> {
@@ -29,9 +32,9 @@ async function mediaParts(post: ApifyPost): Promise<ContentPart[]> {
  * A Reel's video is downloaded so the model watches it, not just its caption (ADR 0005).
  */
 export const readInstagram: Reader = async (item) => {
-  const res = await fetch(`${APIFY_API}/acts/${env.apifyActor}/run-sync-get-dataset-items?token=${env.apifyToken}`, {
+  const res = await fetch(`${APIFY_API}/acts/${env.apifyActor}/run-sync-get-dataset-items`, {
     method: "POST",
-    headers: { "content-type": "application/json" },
+    headers: { authorization: `Bearer ${env.apifyToken}`, "content-type": "application/json" },
     body: JSON.stringify({ directUrls: [item.url], resultsType: "posts", resultsLimit: 1 }),
   });
   const body: unknown = await res.json().catch(() => null);
@@ -42,6 +45,7 @@ export const readInstagram: Reader = async (item) => {
 
   const post = Array.isArray(body) ? (body[0] as ApifyPost | undefined) : undefined;
   if (!post) throw new Error("Instagram post not found or not public");
+  if (post.error) throw new Error(`Instagram: ${post.errorDescription ?? post.error}`);
 
   const author = `@${post.ownerUsername ?? "?"}${post.ownerFullName ? ` (${post.ownerFullName})` : ""}`;
   const kind = post.type === "Video" ? "Reel" : post.type === "Sidecar" ? "karuzela" : "post";

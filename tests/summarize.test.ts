@@ -1,7 +1,16 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { summarizeItem } from "@/summarize";
 import { clearItems, getItem, insertPendingLink, insertPendingUpload } from "./items";
-import { fxtwitterAnswers, network, openrouterAnswers, SAMPLE_REPLY, type OpenRouterRequest } from "./network";
+import {
+  fxtwitterAnswers,
+  network,
+  openrouterAnswers,
+  openrouterCaptures,
+  SAMPLE_REPLY,
+  userContent,
+  videoFileAnswers,
+  type OpenRouterRequest,
+} from "./network";
 
 const X_POST = "https://x.com/jack/status/20";
 
@@ -98,18 +107,20 @@ describe("summarizeItem", () => {
     expect(await getItem(id)).toMatchObject({ status: "failed", attempts: 2 });
   });
 
-  it("sends the thumbnail of a post's video and tells the model there is a video", async () => {
+  it("downloads a post's video and sends it to the model inline", async () => {
     const requests: OpenRouterRequest[] = [];
-    network.use(fxtwitterAnswers("with-video"), openrouterAnswers({ onRequest: (body) => requests.push(body) }));
+    const videoUrl = "https://video.twimg.com/amplify_video/1900000000000000000/vid/avc1/1280x720/AbCdEfGh.mp4?tag=16";
+    const bytes = new Uint8Array([1, 2, 3, 4]);
+    network.use(fxtwitterAnswers("with-video"), videoFileAnswers(videoUrl, bytes), openrouterCaptures(requests));
     const id = await insertPendingLink("https://x.com/NASA/status/1900000000000000001");
 
     await summarizeItem(id);
 
     expect((await getItem(id)).status).toBe("done");
-    const userContent = requests[0].messages.find((m) => m.role === "user")!.content as { type: string }[];
-    expect(userContent.map((part) => part.type)).toEqual(["text", "image_url"]);
-    expect(JSON.stringify(userContent[0])).toContain("zawiera wideo");
-    expect(JSON.stringify(userContent[1])).toContain("amplify_video_thumb");
+    const content = userContent(requests[0]);
+    expect(content.map((part) => part.type)).toEqual(["text", "video_url"]);
+    expect((content[1].video_url as { url: string }).url).toBe(`data:video/mp4;base64,${Buffer.from(bytes).toString("base64")}`);
+    expect(requests[0].provider).toEqual({ only: ["google-ai-studio"] });
   });
 
   it("leaves an Item Pending when its Source has no reader yet", async () => {

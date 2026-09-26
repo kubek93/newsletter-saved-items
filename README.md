@@ -12,7 +12,7 @@ supabase start          # local Postgres, Auth and REST on ports 553xx (see supa
 cp .env.example .env.local
 ```
 
-Fill `.env.local` with `SUPABASE_SERVICE_ROLE_KEY` from `supabase status -o env`, pick any value for `INGEST_TOKEN`, and set `OPENROUTER_API_KEY` (the model id in `OPENROUTER_MODEL` can stay as in the example) `JINA_API_KEY` (free, from jina.ai) and `APIFY_TOKEN` (the actor in `APIFY_ACTOR` can stay as in the example). Then:
+Fill `.env.local` with `SUPABASE_SERVICE_ROLE_KEY` from `supabase status -o env`, pick any value for `INGEST_TOKEN`, and set `OPENROUTER_API_KEY` (the model id in `OPENROUTER_MODEL` can stay as in the example), `JINA_API_KEY` (free, from jina.ai) and `APIFY_TOKEN` (the actor in `APIFY_ACTOR` can stay as in the example). Then:
 
 ```
 pnpm dev

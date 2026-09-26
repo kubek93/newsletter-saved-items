@@ -1,9 +1,11 @@
 import { http, HttpResponse } from "msw";
 import { beforeEach, describe, expect, it } from "vitest";
+import { MAX_INLINE_VIDEO_BYTES } from "@/readers/video";
 import { summarizeItem } from "@/summarize";
 import { clearItems, getItem, insertPendingLink } from "./items";
 import {
   apifyAnswers,
+  apifyFails,
   network,
   openrouterAnswers,
   openrouterCaptures,
@@ -78,8 +80,19 @@ describe("summarizeItem for Instagram", () => {
     expect(item.error).toMatch(/not found|not public/);
   });
 
+  it("marks the Item Failed when Instagram will not show the post (private, removed, login wall)", async () => {
+    network.use(apifyAnswers("blocked"), openrouterAnswers());
+    const id = await insertPendingLink("https://www.instagram.com/p/privateXYZ/");
+
+    await summarizeItem(id);
+
+    const item = await getItem(id);
+    expect(item).toMatchObject({ status: "failed", attempts: 1 });
+    expect(item.error).toContain("restricted");
+  });
+
   it("marks the Item Failed when the actor run fails", async () => {
-    network.use(apifyAnswers({ status: 402, message: "Monthly usage hard limit exceeded" }), openrouterAnswers());
+    network.use(apifyFails(402, "Monthly usage hard limit exceeded"), openrouterAnswers());
     const id = await insertPendingLink("https://www.instagram.com/p/C1abcDEfGh/");
 
     await summarizeItem(id);
@@ -93,7 +106,7 @@ describe("summarizeItem for Instagram", () => {
   it("marks the Item Failed when the Reel is too large to send inline", async () => {
     network.use(
       apifyAnswers("reel"),
-      videoFileAnswers(REEL_VIDEO_URL, REEL_BYTES, 40 * 1024 * 1024),
+      videoFileAnswers(REEL_VIDEO_URL, REEL_BYTES, MAX_INLINE_VIDEO_BYTES + 1),
       openrouterAnswers(),
     );
     const id = await insertPendingLink("https://www.instagram.com/reel/C2reelXYZ1/");
@@ -107,9 +120,11 @@ describe("summarizeItem for Instagram", () => {
 
   it("sends the actor id and token from configuration", async () => {
     let calledUrl = "";
+    let authorization = "";
     network.use(
       http.post("https://api.apify.com/v2/acts/*/run-sync-get-dataset-items", ({ request }) => {
         calledUrl = request.url;
+        authorization = request.headers.get("authorization") ?? "";
         return HttpResponse.json([], { status: 201 });
       }),
     );
@@ -118,6 +133,7 @@ describe("summarizeItem for Instagram", () => {
     await summarizeItem(id);
 
     expect(calledUrl).toContain(`/acts/${process.env.APIFY_ACTOR}/`);
-    expect(calledUrl).toContain(`token=${process.env.APIFY_TOKEN}`);
+    expect(calledUrl).not.toContain(process.env.APIFY_TOKEN!);
+    expect(authorization).toBe(`Bearer ${process.env.APIFY_TOKEN}`);
   });
 });

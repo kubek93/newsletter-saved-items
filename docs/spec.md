@@ -21,10 +21,10 @@ The Owner saves things during the day (X posts, Instagram posts, web pages, YouT
 | Source | How content is obtained |
 |---|---|
 | X | FxTwitter public API (`api.fxtwitter.com`) by post URL: text, media, author. No auth. |
-| Instagram | Apify Instagram scraper actor by post URL: caption, author, image URLs, video URL for Reels. Paid per result. (ADR 0003) |
+| Instagram | Apify `instagram-scraper` actor by post URL: caption, author, image URLs, video URL for Reels. Paid per result. (ADR 0003) |
 | Web page | Jina Reader (`r.jina.ai`) with a free API key returns the page as text. |
 | YouTube | The video URL is passed directly to Gemini as video input via OpenRouter, provider pinned to Google AI Studio. Public videos only. |
-| Upload | The file in Supabase Storage is passed to the model by signed URL. |
+| Upload | A photo in Supabase Storage is passed to the model by signed URL; a video is downloaded and sent inline. (ADR 0005) |
 
 Anything that cannot be read (paywall, login wall, blocked scraper) makes the Item Failed; there is no per-site special handling beyond the table above.
 
@@ -63,7 +63,6 @@ Supabase Pro, Vercel Pro, Resend, OpenRouter, Apify, Jina Reader, FxTwitter (pub
 ## Still open
 
 - Sender address and domain for Resend (Owner will provide; DNS records needed).
-- Exact Apify actor and whether it returns a usable video URL for Reels.
-- OpenRouter's undocumented size limit for video input; the 100 MB cap may need lowering.
+- Videos above about 15 MB cannot be sent to the model inline (ADR 0005), while Uploads allow 100 MB; how to analyse large uploaded videos is undecided.
 - Whether YouTube URLs work reliably through OpenRouter with the AI Studio provider.
 - Instagram Share Sheet behaviour on current iOS.

@@ -2,6 +2,7 @@ import { CATEGORIES, toCategory } from "@/domain/category";
 import type { Summary } from "@/domain/summary";
 import { env } from "@/lib/env";
 import type { ContentPart } from "@/readers/types";
+import { assertVideosFitInline } from "@/readers/video";
 
 const OPENROUTER_API = "https://openrouter.ai/api/v1/chat/completions";
 
@@ -64,6 +65,7 @@ const VIDEO_PROVIDER = { only: ["google-ai-studio"] };
 
 /** Asks the configured model, through OpenRouter, for a Polish Summary and a Category of the content parts. */
 export async function analyze(parts: ContentPart[]): Promise<Summary> {
+  assertVideosFitInline(parts);
   const hasVideo = parts.some((part) => part.type === "video" || part.type === "youtube");
   const res = await fetch(OPENROUTER_API, {
     method: "POST",

@@ -32,13 +32,16 @@ export function jinaAnswers(name: "page" | "not-found" | "unresolvable") {
   return http.get("https://r.jina.ai/*", () => HttpResponse.json(body, { status: body.code }));
 }
 
-/** The Apify actor run answers with the named recorded dataset, or with an API error. */
-export function apifyAnswers(name: "photo" | "reel" | "sidecar" | "empty" | { status: number; message: string }) {
-  return http.post("https://api.apify.com/v2/acts/*/run-sync-get-dataset-items", () =>
-    typeof name === "string"
-      ? HttpResponse.json(fixture(`apify/${name}.json`) as unknown[], { status: 201 })
-      : HttpResponse.json({ error: { type: "error", message: name.message } }, { status: name.status }),
-  );
+const APIFY_RUN = "https://api.apify.com/v2/acts/*/run-sync-get-dataset-items";
+
+/** The Apify actor run answers with the named recorded dataset. */
+export function apifyAnswers(name: "photo" | "reel" | "sidecar" | "empty" | "blocked") {
+  return http.post(APIFY_RUN, () => HttpResponse.json(fixture(`apify/${name}.json`) as unknown[], { status: 201 }));
+}
+
+/** The Apify actor run fails with an API error. */
+export function apifyFails(status: number, message: string) {
+  return http.post(APIFY_RUN, () => HttpResponse.json({ error: { type: "error", message } }, { status }));
 }
 
 /** A video file on a CDN. `declaredLength` fakes a Content-Length larger than the body, to test the size guard. */
