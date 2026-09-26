@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { POST as registerUpload } from "@/app/api/ingest/upload/route";
 import { POST as requestUploadUrl } from "@/app/api/ingest/upload-url/route";
 import { MAX_INLINE_VIDEO_BYTES } from "@/readers/video";
+import { supabaseAdmin } from "@/lib/supabase";
 import { allItems, clearItems, getItem, waitUntilSummarized } from "./items";
 import { network, openrouterAnswers, openrouterCaptures, userContent, type OpenRouterRequest } from "./network";
 
@@ -20,7 +21,7 @@ async function share(filename: string, mimeType: string, bytes: Uint8Array<Array
   const { uploadUrl, path } = await (await call(requestUploadUrl, { filename, mimeType })).json();
   const put = await fetch(uploadUrl, { method: "PUT", body: new Blob([bytes], { type: mimeType }) });
   expect(put.status).toBe(200);
-  const res = await call(registerUpload, { path, mimeType });
+  const res = await call(registerUpload, { path });
   return { res, path };
 }
 
@@ -33,7 +34,7 @@ describe("file upload through signed URLs", () => {
 
   it("refuses both calls without the token", async () => {
     expect((await call(requestUploadUrl, { filename: "a.jpg", mimeType: "image/jpeg" }, null)).status).toBe(401);
-    expect((await call(registerUpload, { path: "x", mimeType: "image/jpeg" }, "wrong")).status).toBe(401);
+    expect((await call(registerUpload, { path: "x" }, "wrong")).status).toBe(401);
   });
 
   it("rejects an unsupported file type and a missing filename", async () => {
@@ -52,9 +53,27 @@ describe("file upload through signed URLs", () => {
   });
 
   it("refuses to register a path nothing was uploaded to", async () => {
-    const res = await call(registerUpload, { path: "2026/09/nothing-here.jpg", mimeType: "image/jpeg" });
+    const res = await call(registerUpload, { path: "2026/09/nothing-here.jpg" });
     expect(res.status).toBe(400);
     expect(await allItems()).toHaveLength(0);
+  });
+
+  it("lets the bucket refuse a file type the Shortcut should have converted", async () => {
+    const { uploadUrl } = await (await call(requestUploadUrl, { filename: "a.jpg", mimeType: "image/jpeg" })).json();
+
+    const put = await fetch(uploadUrl, { method: "PUT", body: new Blob([JPEG], { type: "image/heic" }) });
+
+    expect(put.status).not.toBe(200);
+  });
+
+  it("takes the file type from Storage, not from the caller", async () => {
+    const { uploadUrl, path } = await (await call(requestUploadUrl, { filename: "clip.mp4", mimeType: "video/mp4" })).json();
+    await fetch(uploadUrl, { method: "PUT", body: new Blob([MP4], { type: "video/mp4" }) });
+
+    const res = await call(registerUpload, { path, mimeType: "image/jpeg" });
+
+    const { id } = await res.json();
+    expect((await getItem(id)).mime_type).toBe("video/mp4");
   });
 
   it("turns an uploaded JPEG into a done Item, the model seeing it through a signed URL", async () => {
@@ -107,7 +126,7 @@ describe("file upload through signed URLs", () => {
   it("registers the same path twice as two Items", async () => {
     const { path } = await share("twice.jpg", "image/jpeg", JPEG);
 
-    const again = await call(registerUpload, { path, mimeType: "image/jpeg" });
+    const again = await call(registerUpload, { path });
 
     expect(again.status).toBe(201);
     expect(await allItems()).toHaveLength(2);
@@ -116,8 +135,9 @@ describe("file upload through signed URLs", () => {
   it("keeps the bucket private", async () => {
     const { path } = await share("secret.jpg", "image/jpeg", JPEG);
 
+    const { data: bucket } = await supabaseAdmin.storage.getBucket("uploads");
+    expect(bucket?.public).toBe(false);
     const res = await fetch(`${process.env.SUPABASE_URL}/storage/v1/object/public/uploads/${path}`);
-
     expect(res.status).not.toBe(200);
   });
 });

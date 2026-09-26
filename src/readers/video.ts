@@ -9,10 +9,10 @@ export async function downloadVideo(url: string): Promise<ContentPart> {
   if (!res.ok) throw new Error(`Video download failed with ${res.status}`);
 
   const declared = Number(res.headers.get("content-length") ?? 0);
-  if (declared > MAX_INLINE_VIDEO_BYTES) throw tooLarge(declared);
+  if (declared > MAX_INLINE_VIDEO_BYTES) throw videoTooLarge(declared);
 
   const bytes = new Uint8Array(await res.arrayBuffer());
-  if (bytes.byteLength > MAX_INLINE_VIDEO_BYTES) throw tooLarge(bytes.byteLength);
+  if (bytes.byteLength > MAX_INLINE_VIDEO_BYTES) throw videoTooLarge(bytes.byteLength);
 
   const mimeType = res.headers.get("content-type")?.split(";")[0] || "video/mp4";
   return { type: "video", bytes, mimeType };
@@ -21,10 +21,11 @@ export async function downloadVideo(url: string): Promise<ContentPart> {
 /** The limit is per request, so several videos in one Item (a carousel) must fit together. */
 export function assertVideosFitInline(parts: ContentPart[]): void {
   const total = parts.reduce((sum, part) => sum + (part.type === "video" ? part.bytes.byteLength : 0), 0);
-  if (total > MAX_INLINE_VIDEO_BYTES) throw tooLarge(total);
+  if (total > MAX_INLINE_VIDEO_BYTES) throw videoTooLarge(total);
 }
 
-function tooLarge(bytes: number): Error {
+/** The error stored on an Item whose video cannot be sent; the same wording wherever the limit bites. */
+export function videoTooLarge(bytes: number): Error {
   const mb = (bytes / 1024 / 1024).toFixed(1);
   return new Error(`Video too large to send to the model inline: ${mb} MB`);
 }

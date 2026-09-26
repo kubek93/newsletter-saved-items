@@ -1,6 +1,7 @@
 import { newLinkItem } from "@/domain/link-item";
 import { afterResponse } from "@/lib/after-response";
 import { isAuthorized } from "@/lib/ingest-auth";
+import { readJson } from "@/lib/read-json";
 import { supabaseAdmin } from "@/lib/supabase";
 import { summarizeItem } from "@/summarize";
 
@@ -9,28 +10,18 @@ const UNIQUE_VIOLATION = "23505";
 /** The Summary is written after the response, in the same invocation; an Apify run alone can take a minute. */
 export const maxDuration = 300;
 
-async function readUrl(request: Request): Promise<string | null> {
-  try {
-    const body: unknown = await request.json();
-    const url = (body as { url?: unknown })?.url;
-    return typeof url === "string" ? url : null;
-  } catch {
-    return null;
-  }
-}
-
 export async function POST(request: Request) {
   if (!isAuthorized(request)) {
     return Response.json({ error: "unauthorized" }, { status: 401 });
   }
 
-  const url = await readUrl(request);
-  if (url === null) {
+  const body = await readJson<{ url?: unknown }>(request);
+  if (typeof body?.url !== "string") {
     return Response.json({ error: "missing url" }, { status: 400 });
   }
   let row: ReturnType<typeof newLinkItem>;
   try {
-    row = newLinkItem(url);
+    row = newLinkItem(body.url);
   } catch {
     return Response.json({ error: "invalid url" }, { status: 400 });
   }

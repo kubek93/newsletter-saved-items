@@ -1,7 +1,7 @@
 import { isUploadMimeType, uploadPathFor } from "@/domain/upload-item";
 import { isAuthorized } from "@/lib/ingest-auth";
 import { readJson } from "@/lib/read-json";
-import { uploads } from "@/lib/uploads";
+import { uploadsBucket } from "@/lib/uploads";
 
 /**
  * First call of a file share: hands the Shortcut a signed URL to PUT the file straight into Storage,
@@ -20,7 +20,7 @@ export async function POST(request: Request) {
     return Response.json({ error: "unsupported mimeType" }, { status: 400 });
   }
 
-  const { data, error } = await uploads().createSignedUploadUrl(uploadPathFor(body.filename));
+  const { data, error } = await uploadsBucket().createSignedUploadUrl(uploadPathFor(body.filename));
   if (error) throw error;
   return Response.json({ uploadUrl: data.signedUrl, path: data.path });
 }

@@ -29,7 +29,7 @@ curl -X POST http://localhost:3000/api/ingest/link \
 
 The response is `{"status":"created","id":"..."}` the first time and `{"status":"duplicate","id":"..."}` afterwards.
 
-Save a photo or video (what the Shortcut does in three calls; the file never passes through the app, ADR 0004):
+Save a photo or video (what the Shortcut does in three calls; the file never passes through Vercel, ADR 0004):
 
 ```
 # 1. ask for a signed upload URL
