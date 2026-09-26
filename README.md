@@ -51,7 +51,7 @@ Server-rendered pages at `/`, behind Google sign-in through Supabase Auth. Only 
 
 Google provider setup (once, in the Supabase dashboard): Authentication → Providers → Google, with a Google Cloud OAuth client whose authorised redirect URI is `https://<project-ref>.supabase.co/auth/v1/callback`. Add `PANEL_URL/auth/callback` to the allowed redirect URLs. Locally the same is done in `supabase/config.toml` (`[auth.external.google]`) with `SUPABASE_AUTH_GOOGLE_CLIENT_ID` and `SUPABASE_AUTH_GOOGLE_SECRET`; `SUPABASE_ANON_KEY` comes from `supabase status -o env`.
 
-The Item list is filtered by Category and by Digest Day range through the query string (`/?category=Ceramika&from=2026-09-01&to=2026-09-30`).
+The Item list is filtered by Category and by Digest Day range (the day an Item belongs to in the Digest, 03:00 to 03:00) through the query string (`/?category=Ceramika&from=2026-09-01&to=2026-09-30`).
 
 ## Cron jobs
 

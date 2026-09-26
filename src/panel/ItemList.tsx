@@ -1,10 +1,11 @@
 import Link from "next/link";
 import { CATEGORIES } from "@/domain/category";
 import type { Item, Source, Status } from "@/domain/item";
+import { uploadFilename } from "@/domain/upload-item";
 import type { ItemFilters } from "./items";
 
-export const SOURCE_LABELS: Record<Source, string> = { x: "X", instagram: "Instagram", web: "Web", upload: "Plik" };
-export const STATUS_LABELS: Record<Status, string> = { pending: "Oczekuje", done: "Gotowe", failed: "Nie odczytano" };
+const SOURCE_LABELS: Record<Source, string> = { x: "X", instagram: "Instagram", web: "Web", upload: "Plik" };
+const STATUS_LABELS: Record<Status, string> = { pending: "Czeka na opis", done: "Gotowe", failed: "Nie odczytano" };
 
 const dateFormat = new Intl.DateTimeFormat("pl-PL", {
   timeZone: "Europe/Warsaw",
@@ -16,8 +17,8 @@ const dateFormat = new Intl.DateTimeFormat("pl-PL", {
 });
 
 /** What the Owner sees for an Item before it has a title: the link itself, or the file name. */
-export function itemLabel(item: Item): string {
-  return item.title ?? item.url ?? item.storage_path?.slice(item.storage_path.lastIndexOf("/") + 1) ?? item.id;
+function itemLabel(item: Item): string {
+  return item.title ?? item.url ?? (item.storage_path ? uploadFilename(item.storage_path) : item.id);
 }
 
 export function ItemList({ items, filters }: { items: Item[]; filters: ItemFilters }) {
@@ -36,11 +37,11 @@ export function ItemList({ items, filters }: { items: Item[]; filters: ItemFilte
           </select>
         </label>
         <label>
-          Od
+          Digest od
           <input type="date" name="from" defaultValue={filters.from ?? ""} />
         </label>
         <label>
-          Do
+          Digest do
           <input type="date" name="to" defaultValue={filters.to ?? ""} />
         </label>
         <button type="submit">Filtruj</button>

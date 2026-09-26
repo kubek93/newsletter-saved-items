@@ -1,21 +1,19 @@
-import { env } from "@/lib/env";
-import { accessFor, supabaseForRequest } from "@/panel/auth";
+import type { NextRequest } from "next/server";
+import { accessOf, supabaseForRoute } from "@/panel/auth";
+import { loginPath } from "@/panel/owner";
 
 /** Where Google sends the browser back: turn the code into a session, then let only the Owner through. */
-export async function GET(request: Request) {
-  const code = new URL(request.url).searchParams.get("code");
-  if (!code) {
-    return Response.redirect(`${env.panelUrl}/login?error=1`, 303);
-  }
+export async function GET(request: NextRequest) {
+  const { supabase, redirectTo } = supabaseForRoute(request);
+  const code = request.nextUrl.searchParams.get("code");
+  if (!code) return redirectTo(loginPath("error"));
 
-  const supabase = await supabaseForRequest();
-  const { data, error } = await supabase.auth.exchangeCodeForSession(code);
-  if (error) {
-    return Response.redirect(`${env.panelUrl}/login?error=1`, 303);
-  }
-  if (accessFor(data.user) !== "owner") {
+  const { error } = await supabase.auth.exchangeCodeForSession(code);
+  if (error) return redirectTo(loginPath("error"));
+
+  if ((await accessOf(supabase)).access !== "owner") {
     await supabase.auth.signOut();
-    return Response.redirect(`${env.panelUrl}/login?refused=1`, 303);
+    return redirectTo(loginPath("refused"));
   }
-  return Response.redirect(`${env.panelUrl}/`, 303);
+  return redirectTo("/");
 }

@@ -1,8 +1,9 @@
-import { env } from "@/lib/env";
-import { supabaseForRequest } from "@/panel/auth";
+import type { NextRequest } from "next/server";
+import { supabaseForRoute } from "@/panel/auth";
+import { loginPath } from "@/panel/owner";
 
-export async function POST() {
-  const supabase = await supabaseForRequest();
+export async function POST(request: NextRequest) {
+  const { supabase, redirectTo } = supabaseForRoute(request);
   await supabase.auth.signOut();
-  return Response.redirect(`${env.panelUrl}/login`, 303);
+  return redirectTo(loginPath());
 }

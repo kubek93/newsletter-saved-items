@@ -3,7 +3,11 @@ const MESSAGES: Record<string, string> = {
   error: "Logowanie się nie powiodło. Spróbuj jeszcze raz.",
 };
 
-export default async function LoginPage({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
+export default async function LoginPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
   const params = await searchParams;
   const message = params.refused ? MESSAGES.refused : params.error ? MESSAGES.error : null;
   return (

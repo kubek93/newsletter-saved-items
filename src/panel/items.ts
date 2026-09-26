@@ -1,24 +1,21 @@
-import { toCategory, type Category } from "@/domain/category";
+import { isCategory, type Category } from "@/domain/category";
+import { isDigestDay } from "@/domain/digest-day";
 import type { Item } from "@/domain/item";
 import { supabaseAdmin } from "@/lib/supabase";
 
 /** What the Item list can be narrowed to. Dates are Digest Days (YYYY-MM-DD), inclusive. */
 export type ItemFilters = { category?: Category; from?: string; to?: string };
 
-const DAY = /^\d{4}-\d{2}-\d{2}$/;
-
-function day(value: string | undefined): string | undefined {
-  return value && DAY.test(value) ? value : undefined;
-}
-
 /** Filters out of the page's query string; anything malformed is ignored rather than refused. */
 export function parseFilters(params: Record<string, string | string[] | undefined>): ItemFilters {
   const single = (key: string) => (Array.isArray(params[key]) ? params[key][0] : params[key]);
   const category = single("category");
+  const from = single("from");
+  const to = single("to");
   return {
-    category: category && toCategory(category) === category ? (category as Category) : undefined,
-    from: day(single("from")),
-    to: day(single("to")),
+    category: isCategory(category) ? category : undefined,
+    from: isDigestDay(from) ? from : undefined,
+    to: isDigestDay(to) ? to : undefined,
   };
 }
 
