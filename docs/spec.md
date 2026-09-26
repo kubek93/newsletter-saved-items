@@ -37,7 +37,7 @@ Anything that cannot be read (paywall, login wall, blocked scraper) makes the It
 
 ## Categories
 
-AI, IT, Pomysły na produkty, Ceramika, Zdrowie, Siłownia, Jedzenie, Inne. The AI picks one; the Owner may change it in the Panel. "Inne" is the catch-all.
+AI, IT, Pomysły na produkty, Ceramika, Zdrowie, Siłownia, Jedzenie, Polityka, Finanse, Inne. The AI picks one; the Owner may change it in the Panel. "Inne" is the catch-all.
 
 ## Digest
 

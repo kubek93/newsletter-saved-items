@@ -1,6 +1,7 @@
-import { beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { POST } from "@/app/api/ingest/link/route";
-import { supabaseAdmin } from "@/lib/supabase";
+import { allItems, clearItems, getItem, waitUntilSummarized } from "./items";
+import { fxtwitterAnswers, network, openrouterAnswers } from "./network";
 
 const TOKEN = process.env.INGEST_TOKEN!;
 
@@ -16,17 +17,13 @@ function post(body: unknown, token: string | null = TOKEN): Promise<Response> {
   );
 }
 
-async function allItems() {
-  const { data, error } = await supabaseAdmin.from("items").select("*").order("saved_at");
-  if (error) throw error;
-  return data;
-}
-
 describe("POST /api/ingest/link", () => {
   beforeEach(async () => {
-    const { error } = await supabaseAdmin.from("items").delete().not("id", "is", null);
-    if (error) throw error;
+    await clearItems();
+    // Every created Item gets its Summary written in the background; give those calls somewhere to go.
+    network.use(fxtwitterAnswers("text-only"), openrouterAnswers());
   });
+  afterEach(() => waitUntilSummarized());
 
   it("refuses a request without a token", async () => {
     const res = await post({ url: "https://example.com/a" }, null);
@@ -53,7 +50,6 @@ describe("POST /api/ingest/link", () => {
     expect(items[0]).toMatchObject({
       id: body.id,
       source: "x",
-      status: "pending",
       attempts: 0,
       url: "https://twitter.com/someone/status/123?s=20",
       normalized_url: "https://x.com/someone/status/123",
@@ -85,5 +81,20 @@ describe("POST /api/ingest/link", () => {
     expect((await post({})).status).toBe(400);
     expect((await post("this is not json")).status).toBe(400);
     expect(await allItems()).toHaveLength(0);
+  });
+
+  it("answers before the analysis finishes, and the Item ends up done", async () => {
+    network.use(openrouterAnswers({ delayMs: 1500 }));
+    const startedAt = Date.now();
+
+    const res = await post({ url: "https://x.com/jack/status/20" });
+
+    expect(res.status).toBe(201);
+    expect(Date.now() - startedAt).toBeLessThan(1000);
+    const { id } = await res.json();
+    expect((await getItem(id)).status).toBe("pending");
+
+    await waitUntilSummarized();
+    expect((await getItem(id)).status).toBe("done");
   });
 });
