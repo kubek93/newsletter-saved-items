@@ -23,7 +23,8 @@ The Owner saves things during the day (X posts, Instagram posts, web pages, YouT
 | X | FxTwitter public API (`api.fxtwitter.com`) by post URL: text, media, author. No auth. |
 | Instagram | Apify `instagram-scraper` actor by post URL: caption, author, image URLs, video URL for Reels. Paid per result. (ADR 0003) |
 | Web page | Firecrawl (`api.firecrawl.dev`, free tier) returns the page's main content as Markdown. |
-| YouTube | The video URL is passed directly to Gemini as video input via OpenRouter, provider pinned to Google AI Studio. Public videos only. |
+| YouTube | A video URL is passed directly to Gemini as video input via OpenRouter, provider pinned to Google AI Studio (public videos only); a channel or playlist is read as a page. |
+| Facebook, Allegro, Amazon | Their own Sources (by host) so they can be filtered, read as pages through Firecrawl. |
 | Upload | A photo in Supabase Storage is passed to the model by signed URL; a video is downloaded and sent inline. (ADR 0005) |
 
 Anything that cannot be read (paywall, login wall, blocked scraper) makes the Item Failed; there is no per-site special handling beyond the table above.
@@ -37,7 +38,7 @@ Anything that cannot be read (paywall, login wall, blocked scraper) makes the It
 
 ## Categories
 
-AI, IT, Pomysły na produkty, Ceramika, Zdrowie, Siłownia, Jedzenie, Polityka, Finanse, Inne. The AI picks one; the Owner may change it in the Panel. "Inne" is the catch-all.
+AI, IT, Pomysły na produkty, Produkty, Ceramika, Zdrowie, Siłownia, Jedzenie, Polityka, Finanse, Inne. The AI picks one; the Owner may change it in the Panel. "Inne" is the catch-all.
 
 ## Digest
 

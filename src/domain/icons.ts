@@ -6,6 +6,7 @@ export const CATEGORY_ICONS: Record<Category, string> = {
   AI: "🤖",
   IT: "💻",
   "Pomysły na produkty": "💡",
+  Produkty: "🛒",
   Ceramika: "🏺",
   Zdrowie: "🩺",
   Siłownia: "🏋️",
@@ -18,6 +19,10 @@ export const CATEGORY_ICONS: Record<Category, string> = {
 export const SOURCE_ICONS: Record<Source, string> = {
   x: "𝕏",
   instagram: "📷",
+  youtube: "▶️",
+  facebook: "📘",
+  allegro: "🛍️",
+  amazon: "📦",
   web: "🌐",
   upload: "📁",
 };

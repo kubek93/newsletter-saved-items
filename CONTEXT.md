@@ -9,7 +9,7 @@ One saved thing: an X post, an Instagram post, a web link, a photo or a video. H
 _Avoid_: element, entry, post, saved item, wpis
 
 **Source**:
-Where an Item came from. One of: X, Instagram, Web (any other shared link, including YouTube), Upload (a photo or video from the Owner's device). Every Source reaches the system the same way: shared by the Owner from the Share Sheet.
+Where an Item came from. One of: X, Instagram, YouTube, Facebook, Allegro, Amazon, Web (any other shared link), Upload (a photo or video from the Owner's device). Told apart by the link's host; a Source says where the link came from, not how it is read. Every Source reaches the system the same way: shared by the Owner from the Share Sheet.
 _Avoid_: origin, platform, channel, kanał
 
 **Summary**:
@@ -21,7 +21,7 @@ The state of an Item from the moment it is saved until its Summary exists. A Pen
 _Avoid_: processing, queued, in progress, oczekujący
 
 **Category**:
-One label from a closed list defined by the Owner: AI, IT, Pomysły na produkty, Ceramika, Zdrowie, Siłownia, Jedzenie, Polityka, Finanse, Inne. "Inne" is the catch-all for anything that fits none of the others. The AI assigns it to an Item; the Owner may change it in the Panel. An Item has exactly one Category.
+One label from a closed list defined by the Owner: AI, IT, Pomysły na produkty, Produkty, Ceramika, Zdrowie, Siłownia, Jedzenie, Polityka, Finanse, Inne. "Inne" is the catch-all for anything that fits none of the others. The AI assigns it to an Item; the Owner may change it in the Panel. An Item has exactly one Category.
 _Avoid_: tag, label, topic, group, temat
 
 **Digest**:

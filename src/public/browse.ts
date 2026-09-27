@@ -1,5 +1,5 @@
 import { isCategory, type Category } from "@/domain/category";
-import type { Item, Source } from "@/domain/item";
+import { isSource, type Item, type Source } from "@/domain/item";
 import { isVideoMimeType } from "@/domain/upload-item";
 import { supabaseAdmin } from "@/lib/supabase";
 import { signedUploadUrl } from "@/lib/uploads";
@@ -8,12 +8,6 @@ import { signedUploadUrl } from "@/lib/uploads";
 export type PublicItem = Pick<Item, "id" | "source" | "url" | "title" | "description" | "recap" | "category" | "digest_day" | "saved_at">;
 
 export type BrowseFilters = { category?: Category; source?: Source };
-
-const SOURCES: Source[] = ["x", "instagram", "web", "upload"];
-
-export function isSource(value: unknown): value is Source {
-  return (SOURCES as unknown[]).includes(value);
-}
 
 export function parseBrowseFilters(params: Record<string, string | string[] | undefined>): BrowseFilters {
   const single = (key: string) => (Array.isArray(params[key]) ? params[key][0] : params[key]);

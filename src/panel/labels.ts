@@ -2,7 +2,16 @@ import type { Item, Source, Status } from "@/domain/item";
 import { uploadFilename } from "@/domain/upload-item";
 
 /** Polish UI words for the domain's enums. */
-export const SOURCE_LABELS: Record<Source, string> = { x: "X", instagram: "Instagram", web: "Web", upload: "Plik" };
+export const SOURCE_LABELS: Record<Source, string> = {
+  x: "X",
+  instagram: "Instagram",
+  youtube: "YouTube",
+  facebook: "Facebook",
+  allegro: "Allegro",
+  amazon: "Amazon",
+  web: "Web",
+  upload: "Plik",
+};
 export const STATUS_LABELS: Record<Status, string> = {
   pending: "Czeka na podsumowanie",
   done: "Gotowe",

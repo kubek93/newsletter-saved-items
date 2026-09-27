@@ -2,11 +2,9 @@ import Link from "next/link";
 import { CATEGORIES_ALPHABETICAL } from "@/domain/category";
 import { formatDigestDay } from "@/domain/digest-day";
 import { CATEGORY_ICONS, SOURCE_ICONS } from "@/domain/icons";
-import type { Source } from "@/domain/item";
+import { SOURCES } from "@/domain/item";
 import { SOURCE_LABELS } from "@/panel/labels";
 import { applyFilters, countBy, groupByDigestDay, readingMinutes, type BrowseFilters, type PublicItem } from "./browse";
-
-const SOURCES: Source[] = ["x", "instagram", "web", "upload"];
 
 function href(filters: BrowseFilters): string {
   const query = new URLSearchParams();

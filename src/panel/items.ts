@@ -1,18 +1,12 @@
 import { isCategory, type Category } from "@/domain/category";
 import { isDigestDay } from "@/domain/digest-day";
-import type { Item, Source } from "@/domain/item";
+import { isSource, type Item, type Source } from "@/domain/item";
 import { isVideoMimeType } from "@/domain/upload-item";
 import { supabaseAdmin } from "@/lib/supabase";
 import { signedUploadUrl, uploadsBucket } from "@/lib/uploads";
 
 /** What the Item list can be narrowed to. Dates are Digest Days (YYYY-MM-DD), inclusive. */
 export type ItemFilters = { category?: Category; source?: Source; from?: string; to?: string };
-
-const SOURCES: readonly Source[] = ["x", "instagram", "web", "upload"];
-
-export function isSource(value: unknown): value is Source {
-  return (SOURCES as readonly unknown[]).includes(value);
-}
 
 /** Filters out of the page's query string; anything malformed is ignored rather than refused. */
 export function parseFilters(params: Record<string, string | string[] | undefined>): ItemFilters {

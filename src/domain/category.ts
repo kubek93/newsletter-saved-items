@@ -3,6 +3,7 @@ export const CATEGORIES = [
   "AI",
   "IT",
   "Pomysły na produkty",
+  "Produkty",
   "Ceramika",
   "Zdrowie",
   "Siłownia",

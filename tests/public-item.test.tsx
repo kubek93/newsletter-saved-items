@@ -47,7 +47,7 @@ describe("PublicItemView", () => {
     const html = renderToStaticMarkup(<PublicItemView item={item} embed={embedFor(item)} openUrl={item.url} />);
 
     const order = [
-      '<span class="badge">🌐 Web</span>',
+      '<span class="badge">▶️ YouTube</span>',
       '<span class="badge">📌 Inne</span>',
       "<h1>Szkliwo: jak działa</h1>",
       "<h2>W jednym zdaniu</h2>",

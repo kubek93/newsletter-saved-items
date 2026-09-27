@@ -61,7 +61,7 @@ describe("POST /api/ingest/link", () => {
     await post({ url: "https://www.youtube.com/watch?v=abc" });
     await post({ url: "https://example.com/article" });
 
-    expect((await allItems()).map((i) => i.source)).toEqual(["instagram", "web", "web"]);
+    expect((await allItems()).map((i) => i.source)).toEqual(["instagram", "youtube", "web"]);
   });
 
   it("answers duplicate for an already-saved link, including a tracking-parameter variant", async () => {
