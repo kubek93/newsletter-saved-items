@@ -118,7 +118,7 @@ describe("sendDigest", () => {
     await sendDigest(MORNING);
 
     expect(calls[0].html).toContain("https://example.com/paywall</a> (nie udało się odczytać)");
-    expect(calls[0].html).toContain(`${process.env.PANEL_URL}/items/${data!.id}`);
+    expect(calls[0].html).toContain(`${process.env.PANEL_URL}/p/${data!.id}`);
   });
 
   it("after a partial failure, a second run sends only to the Recipients who did not get it", async () => {

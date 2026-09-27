@@ -44,9 +44,11 @@ describe("Browse", () => {
     const order = ["26 WRZEŚNIA 2026", "Model językowy", "25 WRZEŚNIA 2026", "Glazura popiołowa", "Reel o mobilności", "24 WRZEŚNIA 2026", "Kubek z pieca"].map((s) => html.indexOf(s));
     expect(order.every((p) => p >= 0)).toBe(true);
     expect([...order].sort((a, b) => a - b)).toEqual(order);
-    expect(html).toContain('<p class="meta">X · 1 min czytania</p>');
-    expect(html).toContain('<p class="meta">Plik · 1 min czytania</p>');
-    expect(html).toContain('<a href="https://example.com/glazura" rel="noreferrer" target="_blank">');
+    expect(html).toContain('<span>𝕏 X</span><span>🤖 AI</span><span>1 min czytania</span>');
+    expect(html).toContain('<span>📁 Plik</span><span>🏺 Ceramika</span>');
+    expect(html).toContain('<p class="tagline">Krótko o tym.</p>');
+    expect(html).toMatch(/<a href="\/p\/[0-9a-f-]{36}"><h3>Glazura popiołowa<\/h3>/);
+    expect(html).not.toContain('href="https://example.com/glazura"');
     expect(html).not.toContain("pending");
     expect(html).not.toContain("paywall");
   });
@@ -55,9 +57,9 @@ describe("Browse", () => {
     const html = renderToStaticMarkup(<Browse items={await listPublicItems()} filters={{ category: "Ceramika" }} />);
 
     const categories = [...html.matchAll(/<span>([^<]+)<\/span><span class="count">(\d+)<\/span>/g)].map((m) => [m[1], m[2]]);
-    expect(categories.slice(0, 4)).toEqual([["Wszystkie", "4"], ["AI", "1"], ["Ceramika", "2"], ["Finanse", "0"]]);
-    expect(categories).toContainEqual(["Web", "1"]);
-    expect(categories).toContainEqual(["Plik", "1"]);
+    expect(categories.slice(0, 4)).toEqual([["Wszystkie", "4"], ["🤖 AI", "1"], ["🏺 Ceramika", "2"], ["💰 Finanse", "0"]]);
+    expect(categories).toContainEqual(["🌐 Web", "1"]);
+    expect(categories).toContainEqual(["📁 Plik", "1"]);
     expect(html).toContain('<li class="active"><a href="/?category=Ceramika">');
     expect(html).toContain("Glazura popiołowa");
     expect(html).toContain("Kubek z pieca");
@@ -72,6 +74,12 @@ describe("Browse", () => {
     expect(html).not.toContain("Glazura popiołowa");
     expect(html).toContain('href="/?category=AI&amp;source=upload"');
     expect(html).toContain('href="/?category=Ceramika&amp;source=web"');
+  });
+
+  it("folds the filters behind a label that names the active ones", async () => {
+    const html = renderToStaticMarkup(<Browse items={await listPublicItems()} filters={{ category: "AI", source: "x" }} />);
+    expect(html).toContain('<input type="checkbox" id="filters-toggle" class="filters-toggle"/>');
+    expect(html).toContain('<label for="filters-toggle" class="filters-label">Filtry: AI · X</label>');
   });
 
   it("says so when nothing matches", () => {

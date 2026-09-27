@@ -1,6 +1,8 @@
 import { isCategory, type Category } from "@/domain/category";
 import type { Item, Source } from "@/domain/item";
+import { isVideoMimeType } from "@/domain/upload-item";
 import { supabaseAdmin } from "@/lib/supabase";
+import { signedUploadUrl } from "@/lib/uploads";
 
 /** What anyone may see: only Items whose Summary exists, and only the fields the page shows. */
 export type PublicItem = Pick<Item, "id" | "source" | "url" | "title" | "description" | "recap" | "category" | "digest_day" | "saved_at">;
@@ -30,6 +32,25 @@ export async function listPublicItems(): Promise<PublicItem[]> {
     .order("saved_at", { ascending: false });
   if (error) throw error;
   return data as PublicItem[];
+}
+
+export type PublicMedia = { url: string; video: boolean };
+
+/** One done Item for its public page, with a signed URL to its file when it is an Upload. Null otherwise. */
+export async function loadPublicItem(id: string): Promise<{ item: PublicItem; media?: PublicMedia } | null> {
+  const { data, error } = await supabaseAdmin
+    .from("items")
+    .select("id, source, url, title, description, recap, category, digest_day, saved_at, storage_path, mime_type")
+    .eq("id", id)
+    .eq("status", "done")
+    .maybeSingle();
+  if (error) throw error;
+  if (!data) return null;
+  const { storage_path, mime_type, ...item } = data as PublicItem & { storage_path: string | null; mime_type: string | null };
+  if (item.source === "upload" && storage_path) {
+    return { item, media: { url: await signedUploadUrl(storage_path), video: isVideoMimeType(mime_type ?? "") } };
+  }
+  return { item };
 }
 
 export function applyFilters(items: PublicItem[], filters: BrowseFilters): PublicItem[] {

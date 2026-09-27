@@ -17,9 +17,9 @@ function paragraphs(text: string): string {
     .join("");
 }
 
-/** Where a Recipient lands when clicking an Item: the original for a link, its Panel page for an Upload. */
+/** Where a Recipient lands when clicking an Item: the original for a link, its public page for an Upload. */
 export function linkFor(item: Item, panelUrl: string): string {
-  return item.url ?? `${panelUrl}/items/${item.id}`;
+  return item.url ?? `${panelUrl}/p/${item.id}`;
 }
 
 function renderDone(item: Item, panelUrl: string): string {

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { CATEGORIES_ALPHABETICAL } from "@/domain/category";
 import { formatDigestDay } from "@/domain/digest-day";
+import { CATEGORY_ICONS, SOURCE_ICONS } from "@/domain/icons";
 import type { Source } from "@/domain/item";
 import { SOURCE_LABELS } from "@/panel/labels";
 import { applyFilters, countBy, groupByDigestDay, readingMinutes, type BrowseFilters, type PublicItem } from "./browse";
@@ -55,23 +56,22 @@ function FilterList<K extends string>({
 }
 
 function Tile({ item }: { item: PublicItem }) {
-  const meta = `${SOURCE_LABELS[item.source]} · ${readingMinutes(item)} min czytania`;
-  const body = (
-    <>
-      <h3>{item.title}</h3>
-      <p className="meta">{meta}</p>
-      {item.recap && <p className="recap">{item.recap}</p>}
-    </>
-  );
+  const category = item.category ?? "Inne";
   return (
     <article className="tile">
-      {item.url ? (
-        <a href={item.url} rel="noreferrer" target="_blank">
-          {body}
-        </a>
-      ) : (
-        body
-      )}
+      <Link href={`/p/${item.id}`}>
+        <h3>{item.title}</h3>
+        {item.recap && <p className="tagline">{item.recap}</p>}
+        <p className="meta">
+          <span>
+            {SOURCE_ICONS[item.source]} {SOURCE_LABELS[item.source]}
+          </span>
+          <span>
+            {CATEGORY_ICONS[category]} {category}
+          </span>
+          <span>{readingMinutes(item)} min czytania</span>
+        </p>
+      </Link>
     </article>
   );
 }
@@ -80,15 +80,21 @@ function Tile({ item }: { item: PublicItem }) {
 export function Browse({ items, filters }: { items: PublicItem[]; filters: BrowseFilters }) {
   const shown = applyFilters(items, filters);
   const sections = groupByDigestDay(shown);
+  const active = [filters.category, filters.source && SOURCE_LABELS[filters.source]].filter(Boolean).join(" · ");
   return (
     <div className="browse">
-      <aside>
+      {/* On a phone the filters are folded behind this label; on a wide screen they are always shown. */}
+      <input type="checkbox" id="filters-toggle" className="filters-toggle" />
+      <label htmlFor="filters-toggle" className="filters-label">
+        Filtry{active ? `: ${active}` : ""}
+      </label>
+      <aside className="filters-panel">
         <FilterList
           title="Kategorie"
           values={CATEGORIES_ALPHABETICAL}
           counts={countBy(applyFilters(items, { source: filters.source }), (item) => item.category)}
           selected={filters.category}
-          label={(category) => category}
+          label={(category) => `${CATEGORY_ICONS[category]} ${category}`}
           hrefFor={(category) => href({ ...filters, category })}
         />
         <FilterList
@@ -96,7 +102,7 @@ export function Browse({ items, filters }: { items: PublicItem[]; filters: Brows
           values={SOURCES}
           counts={countBy(applyFilters(items, { category: filters.category }), (item) => item.source)}
           selected={filters.source}
-          label={(source) => SOURCE_LABELS[source]}
+          label={(source) => `${SOURCE_ICONS[source]} ${SOURCE_LABELS[source]}`}
           hrefFor={(source) => href({ ...filters, source })}
         />
       </aside>

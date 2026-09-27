@@ -4,7 +4,7 @@ import { accessFor, loginPath } from "@/panel/owner";
 
 /** The public page at the root, sign-in and the auth routes need no session. */
 const OPEN_PATHS = ["/login", "/auth/"];
-const isOpen = (pathname: string) => pathname === "/" || OPEN_PATHS.some((open) => pathname.startsWith(open));
+const isOpen = (pathname: string) => pathname === "/" || pathname.startsWith("/p/") || OPEN_PATHS.some((open) => pathname.startsWith(open));
 
 /**
  * Runs before every Panel page: refreshes the Supabase session cookies, sends anyone without a session
