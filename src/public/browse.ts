@@ -58,13 +58,6 @@ export function applyFilters(items: PublicItem[], filters: BrowseFilters): Publi
   );
 }
 
-const WORDS_PER_MINUTE = 200;
-
-/** Minutes to read the Summary, never below one. */
-export function readingMinutes(item: Pick<PublicItem, "description" | "recap">): number {
-  const words = `${item.description ?? ""} ${item.recap ?? ""}`.trim().split(/\s+/).filter(Boolean).length;
-  return Math.max(1, Math.round(words / WORDS_PER_MINUTE));
-}
 
 /** Items in sections, one per Digest Day, in the order the Items came. */
 export function groupByDigestDay<T extends { digest_day: string }>(items: T[]): { digestDay: string; items: T[] }[] {

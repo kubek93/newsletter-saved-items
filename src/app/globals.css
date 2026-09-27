@@ -438,3 +438,12 @@ form.danger button {
   font-size: 1.05rem;
   text-decoration: none;
 }
+
+.block ul {
+  margin: 0 0 12px;
+  padding-left: 22px;
+}
+
+.block li {
+  margin: 4px 0;
+}
