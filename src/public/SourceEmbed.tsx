@@ -1,4 +1,5 @@
 import type { Embed } from "./embed";
+import { PlatformEmbed } from "./PlatformEmbed";
 
 /** The summary's paragraphs, split on blank lines. */
 export function Paragraphs({ text }: { text: string }) {
@@ -26,23 +27,8 @@ export function SourceEmbed({ embed }: { embed: Embed }) {
         </div>
       );
     case "x":
-      return (
-        <div className="embed">
-          <blockquote className="twitter-tweet">
-            <a href={embed.url}>{embed.url}</a>
-          </blockquote>
-          <script async src="https://platform.twitter.com/widgets.js" charSet="utf-8" />
-        </div>
-      );
     case "instagram":
-      return (
-        <div className="embed">
-          <blockquote className="instagram-media" data-instgrm-permalink={embed.url} data-instgrm-version="14">
-            <a href={embed.url}>{embed.url}</a>
-          </blockquote>
-          <script async src="https://www.instagram.com/embed.js" />
-        </div>
-      );
+      return <PlatformEmbed kind={embed.kind} url={embed.url} />;
     case "image":
       // eslint-disable-next-line @next/next/no-img-element -- a signed Storage URL, not an optimisable asset
       return <img className="preview" src={embed.url} alt="" />;
