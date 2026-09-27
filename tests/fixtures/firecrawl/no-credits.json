@@ -1,0 +1,5 @@
+{
+  "success": false,
+  "code": "insufficient_credits",
+  "error": "Payment required to access this resource."
+}

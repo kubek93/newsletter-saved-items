@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { POST } from "@/app/api/ingest/link/route";
 import { allItems, clearItems, getItem, waitUntilSummarized } from "./items";
-import { apifyAnswers, fxtwitterAnswers, jinaAnswers, network, openrouterAnswers } from "./network";
+import { apifyAnswers, firecrawlAnswers, fxtwitterAnswers, network, openrouterAnswers } from "./network";
 
 const TOKEN = process.env.INGEST_TOKEN!;
 
@@ -21,7 +21,7 @@ describe("POST /api/ingest/link", () => {
   beforeEach(async () => {
     await clearItems();
     // Every created Item gets its Summary written in the background; give those calls somewhere to go.
-    network.use(fxtwitterAnswers("text-only"), jinaAnswers("page"), apifyAnswers("photo"), openrouterAnswers());
+    network.use(fxtwitterAnswers("text-only"), firecrawlAnswers("page"), apifyAnswers("photo"), openrouterAnswers());
   });
   afterEach(() => waitUntilSummarized());
 

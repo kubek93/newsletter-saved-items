@@ -26,10 +26,12 @@ export function fxtwitterAnswers(name: "text-only" | "with-photo" | "with-video"
   return http.get("https://api.fxtwitter.com/*", () => HttpResponse.json(body, { status: body.code }));
 }
 
-/** Jina Reader answers every page fetch with the named recorded response. */
-export function jinaAnswers(name: "page" | "not-found" | "unresolvable") {
-  const body = fixture(`jina/${name}.json`) as { code: number };
-  return http.get("https://r.jina.ai/*", () => HttpResponse.json(body, { status: body.code }));
+const FIRECRAWL_STATUS: Record<string, number> = { page: 200, "not-found": 200, blocked: 403, "no-credits": 402 };
+
+/** Firecrawl answers every scrape with the named recorded response. */
+export function firecrawlAnswers(name: "page" | "not-found" | "blocked" | "no-credits") {
+  const body = fixture(`firecrawl/${name}.json`) as Record<string, unknown>;
+  return http.post("https://api.firecrawl.dev/v2/scrape", () => HttpResponse.json(body, { status: FIRECRAWL_STATUS[name] }));
 }
 
 const APIFY_RUN = "https://api.apify.com/v2/acts/*/run-sync-get-dataset-items";

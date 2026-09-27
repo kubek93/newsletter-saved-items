@@ -1,0 +1,15 @@
+{
+  "success": true,
+  "data": {
+    "markdown": "# Example Domain\n\nThis domain is for use in documentation examples without needing permission. Avoid use in operations.\n\n[Learn more](https://iana.org/domains/example)",
+    "metadata": {
+      "title": "Example Domain",
+      "sourceURL": "https://example.com/this-page-does-not-exist-404",
+      "url": "https://example.com/this-page-does-not-exist-404",
+      "statusCode": 404,
+      "contentType": "text/html; charset=UTF-8",
+      "proxyUsed": "basic",
+      "creditsUsed": 1
+    }
+  }
+}
