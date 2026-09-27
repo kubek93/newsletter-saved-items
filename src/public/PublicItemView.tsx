@@ -5,13 +5,23 @@ import type { PublicItem } from "./browse";
 import type { Embed } from "./embed";
 import { Paragraphs, SourceEmbed } from "./SourceEmbed";
 
+type Props = {
+  item: PublicItem;
+  embed: Embed | null;
+  openUrl: string | null;
+  /** The signed-in Owner also gets a delete button here, so the Panel is not needed for that. */
+  owner?: boolean;
+};
+
 /** The public page of one Item: what it is in a sentence, the summary, the source itself, and a way to open it. */
-export function PublicItemView({ item, embed, openUrl }: { item: PublicItem; embed: Embed | null; openUrl: string | null }) {
+export function PublicItemView({ item, embed, openUrl, owner = false }: Props) {
   const category = item.category ?? "Inne";
   return (
     <article className="public-item">
       <p className="back">
-        <Link href="/">← Wszystkie</Link>
+        <Link className="button-back" href="/">
+          ← Wszystkie
+        </Link>
       </p>
       <header>
         <p className="badges">
@@ -46,13 +56,24 @@ export function PublicItemView({ item, embed, openUrl }: { item: PublicItem; emb
         </section>
       )}
 
-      {openUrl && (
-        <p className="open">
+      <div className="open-row">
+        <Link className="button-small" href="/">
+          ← Wstecz
+        </Link>
+        {owner && (
+          <form method="post" action={`/items/${item.id}/delete`} className="inline">
+            <input type="hidden" name="back" value="/" />
+            <button type="submit" className="button-small danger">
+              Usuń
+            </button>
+          </form>
+        )}
+        {openUrl && (
           <a className="button-large" href={openUrl} rel="noreferrer" target="_blank">
             Otwórz {item.source === "upload" ? "plik" : "źródło"}
           </a>
-        </p>
-      )}
+        )}
+      </div>
     </article>
   );
 }

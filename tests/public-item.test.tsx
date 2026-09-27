@@ -56,11 +56,25 @@ describe("PublicItemView", () => {
       "<p>Pierwszy akapit.</p><p>Drugi akapit.</p>",
       "<h2>Źródło</h2>",
       'src="https://www.youtube.com/embed/jNQXAC9IVRw"',
+      'class="button-small" href="/"',
       'class="button-large" href="https://www.youtube.com/watch?v=jNQXAC9IVRw"',
       "Otwórz źródło",
     ].map((s) => html.indexOf(s));
     expect(order.every((p) => p >= 0)).toBe(true);
     expect([...order].sort((a, b) => a - b)).toEqual(order);
+    expect(html).toContain('<a class="button-back" href="/">← Wszystkie</a>');
+    expect(html).not.toContain("/delete");
+  });
+
+  it("gives the signed-in Owner a small delete button between back and open, sending them back to the list", async () => {
+    const id = await insertLinkItem("https://example.com/a", DONE);
+    const { item } = (await loadPublicItem(id))!;
+
+    const html = renderToStaticMarkup(<PublicItemView item={item} embed={embedFor(item)} openUrl={item.url} owner />);
+
+    expect(html).toContain(`<form class="inline" action="/items/${id}/delete" method="post"><input type="hidden" name="back" value="/"/><button type="submit" class="button-small danger">Usuń</button></form>`);
+    expect(html.indexOf('class="button-small" href="/"')).toBeLessThan(html.indexOf("/delete"));
+    expect(html.indexOf("/delete")).toBeLessThan(html.indexOf('class="button-large"'));
   });
 
   it("renders the description's paragraphs and bullet lists", async () => {

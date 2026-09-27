@@ -180,6 +180,16 @@ describe("POST /items/[id]/delete", () => {
     expect(await allItems()).toHaveLength(0);
   });
 
+  it("returns to the public list when the form came from there", async () => {
+    const id = await insertLinkItem("https://example.com/a", DONE);
+
+    const res = await postForm(postDelete, `/items/${id}/delete`, { back: "/" });
+
+    expect(res.status).toBe(303);
+    expect(res.headers.get("location")).toBe(`${process.env.PANEL_URL}/`);
+    expect(await allItems()).toHaveLength(0);
+  });
+
   it("removes an Upload together with its file", async () => {
     const path = "2026/09/00000000-0000-0000-0000-000000000003-gone.jpg";
     const id = await insertUpload(path, "image/jpeg");
