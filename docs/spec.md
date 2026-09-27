@@ -65,6 +65,6 @@ Supabase Pro, Vercel Pro, Resend, OpenRouter, Apify, Firecrawl, FxTwitter (publi
 ## Still open
 
 - Sender address and domain for Resend (Owner will provide; DNS records needed).
-- Videos above about 15 MB cannot be sent to the model inline (ADR 0005), while Uploads allow 100 MB; how to analyse large uploaded videos is undecided.
+- Videos above about 15 MB cannot be sent to the model inline (ADR 0005). An X video is fetched in the largest variant expected to fit; an X or Instagram video that still does not fit is skipped and the Summary, made from the text and the thumbnail, says so. Uploads allow 100 MB; how to analyse large uploaded videos is undecided (the Gemini Files API directly is the candidate).
 - Whether YouTube URLs work reliably through OpenRouter with the AI Studio provider.
 - Instagram Share Sheet behaviour on current iOS.

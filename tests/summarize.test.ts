@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it } from "vitest";
+import { MAX_INLINE_VIDEO_BYTES } from "@/readers/video";
 import { summarizeItem } from "@/summarize";
 import { clearItems, getItem, insertPendingLink } from "./items";
 import {
@@ -123,4 +124,27 @@ describe("summarizeItem", () => {
     expect(requests[0].provider).toEqual({ only: ["google-ai-studio"] });
   });
 
+  it("summarises a post from its text and thumbnail, with a note, when its video is too large", async () => {
+    const requests: OpenRouterRequest[] = [];
+    const videoUrl = "https://video.twimg.com/amplify_video/1900000000000000000/vid/avc1/1280x720/AbCdEfGh.mp4?tag=16";
+    network.use(
+      fxtwitterAnswers("with-video"),
+      videoFileAnswers(videoUrl, new Uint8Array([1, 2, 3, 4]), MAX_INLINE_VIDEO_BYTES + 1),
+      openrouterCaptures(requests),
+    );
+    const id = await insertPendingLink("https://x.com/NASA/status/1900000000000000001");
+
+    await summarizeItem(id);
+
+    expect(await getItem(id)).toMatchObject({ status: "done", error: null });
+    const content = userContent(requests[0]);
+    expect(content.map((part) => part.type)).toEqual(["text", "text", "image_url"]);
+    expect(JSON.stringify(content[1])).toContain("15.0 MB");
+    expect(JSON.stringify(content[1])).toContain("pominięte");
+    expect(content[2]).toEqual({
+      type: "image_url",
+      image_url: { url: "https://pbs.twimg.com/amplify_video_thumb/1900000000000000000/img/ThUmBnAiL.jpg" },
+    });
+    expect(requests[0].provider).toBeUndefined();
+  });
 });

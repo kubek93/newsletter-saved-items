@@ -1,6 +1,6 @@
 import { env } from "@/lib/env";
 import type { ContentPart, Reader } from "./types";
-import { downloadVideo } from "./video";
+import { videoOrNote } from "./video";
 
 const APIFY_API = "https://api.apify.com/v2";
 
@@ -21,7 +21,7 @@ async function mediaParts(post: ApifyPost): Promise<ContentPart[]> {
   const slides = post.type === "Sidecar" && post.childPosts?.length ? post.childPosts : [post];
   const parts: ContentPart[] = [];
   for (const slide of slides) {
-    if (slide.videoUrl) parts.push(await downloadVideo(slide.videoUrl));
+    if (slide.videoUrl) parts.push(...(await videoOrNote(slide.videoUrl, slide.displayUrl)));
     else if (slide.displayUrl) parts.push({ type: "image", url: slide.displayUrl });
   }
   return parts;
@@ -29,7 +29,8 @@ async function mediaParts(post: ApifyPost): Promise<ContentPart[]> {
 
 /**
  * Reads an Instagram post or Reel through an Apify scraper actor run synchronously (ADR 0003).
- * A Reel's video is downloaded so the model watches it, not just its caption (ADR 0005).
+ * A Reel's video is downloaded so the model watches it, not just its caption (ADR 0005); one too large to
+ * send is skipped with a note, and the caption and cover carry the Summary.
  */
 export const readInstagram: Reader = async (item) => {
   const res = await fetch(`${APIFY_API}/acts/${env.apifyActor}/run-sync-get-dataset-items`, {
