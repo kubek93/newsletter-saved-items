@@ -10,7 +10,7 @@ export const env = {
   ingestToken: required("INGEST_TOKEN"),
   openrouterApiKey: required("OPENROUTER_API_KEY"),
   openrouterModel: required("OPENROUTER_MODEL"),
-  jinaApiKey: required("JINA_API_KEY"),
+  firecrawlApiKey: required("FIRECRAWL_API_KEY"),
   apifyToken: required("APIFY_TOKEN"),
   apifyActor: required("APIFY_ACTOR"),
   cronSecret: required("CRON_SECRET"),

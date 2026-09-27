@@ -12,7 +12,7 @@ supabase start          # local Postgres, Auth and REST on ports 553xx (see supa
 cp .env.example .env.local
 ```
 
-Fill `.env.local` with `SUPABASE_SERVICE_ROLE_KEY` from `supabase status -o env`, pick any value for `INGEST_TOKEN`, and set `OPENROUTER_API_KEY` (the model id in `OPENROUTER_MODEL` can stay as in the example), `JINA_API_KEY` (free, from jina.ai) and `APIFY_TOKEN` (the actor in `APIFY_ACTOR` can stay as in the example). Then:
+Fill `.env.local` with `SUPABASE_SERVICE_ROLE_KEY` from `supabase status -o env`, pick any value for `INGEST_TOKEN`, and set `OPENROUTER_API_KEY` (the model id in `OPENROUTER_MODEL` can stay as in the example), `FIRECRAWL_API_KEY` (free tier at firecrawl.dev) and `APIFY_TOKEN` (the actor in `APIFY_ACTOR` can stay as in the example). Then:
 
 ```
 pnpm dev
@@ -43,7 +43,7 @@ curl -X POST http://localhost:3000/api/ingest/upload -H "Authorization: Bearer $
   -H "Content-Type: application/json" -d '{"path":"2026/09/<uuid>-IMG_0001.jpg","mimeType":"image/jpeg"}'
 ```
 
-Accepted types: JPEG, PNG, WebP, MP4, QuickTime; the Shortcut converts HEIC to JPEG first. Uploads are never deduplicated. A video above about 15 MB cannot be analysed (ADR 0005) and ends Failed. A created Item is analysed in the background: its Source is read (X posts through FxTwitter, Instagram posts and Reels through an Apify actor, web pages as text through Jina Reader, YouTube links straight to the model as video; other videos are downloaded and sent inline, see ADR 0005), the content goes to the model configured in `OPENROUTER_MODEL`, and the row ends up `done` with a Polish title, description, recap and Category, or `failed` with the error text and one more attempt counted.
+Accepted types: JPEG, PNG, WebP, MP4, QuickTime; the Shortcut converts HEIC to JPEG first. Uploads are never deduplicated. A video above about 15 MB cannot be analysed (ADR 0005) and ends Failed. A created Item is analysed in the background: its Source is read (X posts through FxTwitter, Instagram posts and Reels through an Apify actor, web pages as Markdown through Firecrawl, YouTube links straight to the model as video; other videos are downloaded and sent inline, see ADR 0005), the content goes to the model configured in `OPENROUTER_MODEL`, and the row ends up `done` with a Polish title, description, recap and Category, or `failed` with the error text and one more attempt counted.
 
 ## Panel
 
@@ -83,6 +83,6 @@ pnpm typecheck
 pnpm lint
 ```
 
-HTTP tests call the route handlers directly with a `Request` and assert on the response and on rows in the local database. Every outbound call (FxTwitter, Apify, Jina Reader, video CDNs, OpenRouter) is intercepted by `msw` with recorded fixtures under `tests/fixtures`; an unexpected external request is rejected instead of reaching the network. Pure functions (URL normalisation, Source detection, Digest Day, Category) have table-driven unit tests next to their source.
+HTTP tests call the route handlers directly with a `Request` and assert on the response and on rows in the local database. Every outbound call (FxTwitter, Apify, Firecrawl, video CDNs, OpenRouter) is intercepted by `msw` with recorded fixtures under `tests/fixtures`; an unexpected external request is rejected instead of reaching the network. Pure functions (URL normalisation, Source detection, Digest Day, Category) have table-driven unit tests next to their source.
 
 After changing a migration: `supabase db reset`.

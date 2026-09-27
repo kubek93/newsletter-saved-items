@@ -22,7 +22,7 @@ The Owner saves things during the day (X posts, Instagram posts, web pages, YouT
 |---|---|
 | X | FxTwitter public API (`api.fxtwitter.com`) by post URL: text, media, author. No auth. |
 | Instagram | Apify `instagram-scraper` actor by post URL: caption, author, image URLs, video URL for Reels. Paid per result. (ADR 0003) |
-| Web page | Jina Reader (`r.jina.ai`) with a free API key returns the page as text. |
+| Web page | Firecrawl (`api.firecrawl.dev`, free tier) returns the page's main content as Markdown. |
 | YouTube | The video URL is passed directly to Gemini as video input via OpenRouter, provider pinned to Google AI Studio. Public videos only. |
 | Upload | A photo in Supabase Storage is passed to the model by signed URL; a video is downloaded and sent inline. (ADR 0005) |
 
@@ -58,7 +58,7 @@ AI, IT, Pomysły na produkty, Ceramika, Zdrowie, Siłownia, Jedzenie, Polityka, 
 
 ## External services
 
-Supabase Pro, Vercel Pro, Resend, OpenRouter, Apify, Jina Reader, FxTwitter (public, no account).
+Supabase Pro, Vercel Pro, Resend, OpenRouter, Apify, Firecrawl, FxTwitter (public, no account).
 
 ## Still open
 

@@ -1,4 +1,4 @@
-import { readPage } from "./jina";
+import { readPage } from "./firecrawl";
 import type { Reader } from "./types";
 import { isYouTubeVideoUrl, readYouTube } from "./youtube";
 
