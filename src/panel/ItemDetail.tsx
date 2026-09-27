@@ -2,6 +2,8 @@ import Link from "next/link";
 import { CATEGORIES_ALPHABETICAL } from "@/domain/category";
 import type { Item } from "@/domain/item";
 import { uploadFilename } from "@/domain/upload-item";
+import { embedFor } from "@/public/embed";
+import { Paragraphs, SourceEmbed } from "@/public/SourceEmbed";
 import type { Media } from "./items";
 import { itemLabel, SOURCE_LABELS, STATUS_LABELS } from "./labels";
 
@@ -14,18 +16,10 @@ const dateFormat = new Intl.DateTimeFormat("pl-PL", {
   minute: "2-digit",
 });
 
-function Paragraphs({ text }: { text: string }) {
-  return (
-    <>
-      {text.split(/\n{2,}/).map((paragraph, index) => (
-        <p key={index}>{paragraph}</p>
-      ))}
-    </>
-  );
-}
-
+/** The Owner's page of one Item: the facts to manage it, then the same sections as the public page. */
 export function ItemDetail({ item, media }: { item: Item; media: Media | null }) {
   const heading = itemLabel(item);
+  const embed = embedFor(item, media ? { url: media.url, video: media.kind === "video" } : undefined);
   return (
     <article className="item">
       <p>
@@ -65,22 +59,22 @@ export function ItemDetail({ item, media }: { item: Item; media: Media | null })
         </dd>
       </dl>
 
-      {media &&
-        (media.kind === "video" ? (
-          <video className="preview" src={media.url} controls preload="metadata" />
-        ) : (
-          // eslint-disable-next-line @next/next/no-img-element -- a signed Storage URL, not an optimisable asset
-          <img className="preview" src={media.url} alt={heading} />
-        ))}
-
-      {item.status === "done" && (
-        <section className="summary">
-          {item.description && <Paragraphs text={item.description} />}
-          {item.recap && (
-            <p className="recap">
-              <em>{item.recap}</em>
-            </p>
-          )}
+      {item.status === "done" && item.recap && (
+        <section className="block">
+          <h3>W jednym zdaniu</h3>
+          <p className="lead">{item.recap}</p>
+        </section>
+      )}
+      {item.status === "done" && item.description && (
+        <section className="block">
+          <h3>Streszczenie</h3>
+          <Paragraphs text={item.description} />
+        </section>
+      )}
+      {embed && (
+        <section className="block">
+          <h3>Źródło</h3>
+          <SourceEmbed embed={embed} />
         </section>
       )}
       {item.status === "failed" && (

@@ -33,7 +33,7 @@ async function postForm(handler: FormHandler, path: string, fields: Record<strin
 describe("ItemDetail", () => {
   beforeEach(clearItems);
 
-  it("shows the full Summary, Source link, status, Category and date for a link Item", async () => {
+  it("shows the Summary in sections, the Source link and embed, status, Category and date for a link Item", async () => {
     const id = await insertLinkItem("https://example.com/glazura", { ...DONE, saved_at: "2026-09-22T10:00:00Z" });
     const item = (await loadItem(id))!;
 
@@ -42,14 +42,18 @@ describe("ItemDetail", () => {
     expect(html).toContain("<h2>Glazura popiołowa</h2>");
     expect(html).toContain('<a href="https://example.com/glazura" rel="noreferrer">Web: https://example.com/glazura</a>');
     expect(html).toContain('<dd class="done">Gotowe</dd>');
-    expect(html).toContain("<p>Pierwszy akapit.</p><p>Drugi akapit.</p>");
-    expect(html).toContain("<em>Krótko.</em>");
+    expect(html).toContain('<h3>W jednym zdaniu</h3><p class="lead">Krótko.</p>');
+    expect(html).toContain("<h3>Streszczenie</h3><p>Pierwszy akapit.</p><p>Drugi akapit.</p>");
+    expect(html).toContain("<h3>Źródło</h3>");
+    expect(html).toContain('<a class="link-card" href="https://example.com/glazura"');
+    expect(html.indexOf("W jednym zdaniu")).toBeLessThan(html.indexOf("Streszczenie"));
+    expect(html.indexOf("Streszczenie")).toBeLessThan(html.indexOf("<h3>Źródło</h3>"));
     expect(html).toContain('<option value="Ceramika" selected="">Ceramika</option>');
     expect(html).toContain("22 września 2026 12:00");
     expect(html).not.toContain("<img");
   });
 
-  it("offers exactly the ten Categories", async () => {
+  it("offers every Category", async () => {
     const id = await insertLinkItem("https://example.com/a", DONE);
     const item = (await loadItem(id))!;
 
@@ -67,6 +71,18 @@ describe("ItemDetail", () => {
     expect(html).toContain('<dd class="failed">Nie odczytano</dd>');
   });
 
+  it("embeds a YouTube video and an X post the way the public page does", async () => {
+    const yt = (await loadItem(await insertLinkItem("https://www.youtube.com/watch?v=jNQXAC9IVRw", DONE)))!;
+    const x = (await loadItem(await insertLinkItem("https://x.com/jack/status/20", DONE)))!;
+
+    const ytHtml = renderToStaticMarkup(<ItemDetail item={yt} media={null} />);
+    const xHtml = renderToStaticMarkup(<ItemDetail item={x} media={null} />);
+
+    expect(ytHtml).toContain('src="https://www.youtube.com/embed/jNQXAC9IVRw"');
+    expect(xHtml).toContain('<blockquote class="twitter-tweet">');
+    expect(xHtml).toContain('src="https://platform.twitter.com/widgets.js"');
+  });
+
   it("previews an uploaded photo through a signed Storage URL", async () => {
     const id = await insertUpload("2026/09/00000000-0000-0000-0000-000000000001-kubek.jpg", "image/jpeg");
     const item = (await loadItem(id))!;
@@ -75,7 +91,8 @@ describe("ItemDetail", () => {
     const html = renderToStaticMarkup(<ItemDetail item={item} media={media} />);
 
     expect(media?.kind).toBe("image");
-    expect(html).toContain(`<img class="preview" src="${media!.url.replace(/&/g, "&amp;")}" alt="kubek.jpg"/>`);
+    expect(html).toContain('<h3>Źródło</h3>');
+    expect(html).toContain(`<img class="preview" src="${media!.url.replace(/&/g, "&amp;")}" alt=""/>`);
     expect(media!.url).toContain("/storage/v1/object/sign/uploads/");
     expect((await fetch(media!.url)).status).toBe(200);
   });
