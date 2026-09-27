@@ -12,5 +12,5 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   if (!item) return new Response("Not found", { status: 404 });
 
   await deleteItem(item);
-  return owner.redirectTo("/");
+  return owner.redirectTo("/panel");
 }

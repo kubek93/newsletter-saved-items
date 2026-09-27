@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { CATEGORIES } from "@/domain/category";
+import { CATEGORIES_ALPHABETICAL } from "@/domain/category";
 import type { Item } from "@/domain/item";
 import { uploadFilename } from "@/domain/upload-item";
 import type { Media } from "./items";
@@ -29,7 +29,7 @@ export function ItemDetail({ item, media }: { item: Item; media: Media | null })
   return (
     <article className="item">
       <p>
-        <Link href="/">← Lista</Link>
+        <Link href="/panel">← Lista</Link>
       </p>
       <h2>{heading}</h2>
       <dl className="meta">
@@ -54,7 +54,7 @@ export function ItemDetail({ item, media }: { item: Item; media: Media | null })
           <form method="post" action={`/items/${item.id}/category`} className="inline">
             <select name="category" defaultValue={item.category ?? ""}>
               {item.category === null && <option value="">–</option>}
-              {CATEGORIES.map((category) => (
+              {CATEGORIES_ALPHABETICAL.map((category) => (
                 <option key={category} value={category}>
                   {category}
                 </option>

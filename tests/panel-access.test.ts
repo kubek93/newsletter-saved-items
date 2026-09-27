@@ -8,26 +8,28 @@ const OWNER = process.env.OWNER_EMAIL!;
 
 describe("the Panel's front door (proxy)", () => {
   it("sends an anonymous visitor to sign-in", async () => {
-    const res = await proxy(panelRequest("/"));
+    const res = await proxy(panelRequest("/panel"));
 
     expect(res.status).toBe(307);
     expect(res.headers.get("location")).toBe("http://localhost:3000/login");
   });
 
-  it("lets an anonymous visitor see the sign-in page and the auth routes", async () => {
+  it("lets an anonymous visitor see the public page, the sign-in page and the auth routes", async () => {
+    expect((await proxy(panelRequest("/"))).headers.get("location")).toBeNull();
+    expect((await proxy(panelRequest("/?category=AI"))).headers.get("location")).toBeNull();
     expect((await proxy(panelRequest("/login"))).headers.get("location")).toBeNull();
     expect((await proxy(panelRequest("/auth/callback?code=x"))).headers.get("location")).toBeNull();
   });
 
   it("lets the Owner through", async () => {
-    const res = await proxy(panelRequest("/?category=AI", await sessionCookiesFor(OWNER)));
+    const res = await proxy(panelRequest("/panel?category=AI", await sessionCookiesFor(OWNER)));
 
     expect(res.status).toBe(200);
     expect(res.headers.get("location")).toBeNull();
   });
 
   it("refuses any other Google account: signed out and told why, in Polish terms", async () => {
-    const res = await proxy(panelRequest("/", await sessionCookiesFor("stranger@example.com")));
+    const res = await proxy(panelRequest("/panel", await sessionCookiesFor("stranger@example.com")));
 
     expect(res.status).toBe(307);
     expect(res.headers.get("location")).toBe("http://localhost:3000/login?refused=1");

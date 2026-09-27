@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { CATEGORIES } from "@/domain/category";
+import { CATEGORIES_ALPHABETICAL } from "@/domain/category";
+import type { Source } from "@/domain/item";
 import type { Item } from "@/domain/item";
 import type { ItemFilters } from "./items";
 import { itemLabel, SOURCE_LABELS, STATUS_LABELS } from "./labels";
@@ -16,14 +17,25 @@ const dateFormat = new Intl.DateTimeFormat("pl-PL", {
 export function ItemList({ items, filters }: { items: Item[]; filters: ItemFilters }) {
   return (
     <section>
-      <form method="get" action="/" className="filters">
+      <form method="get" action="/panel" className="filters">
         <label>
           Kategoria
           <select name="category" defaultValue={filters.category ?? ""}>
             <option value="">Wszystkie</option>
-            {CATEGORIES.map((category) => (
+            {CATEGORIES_ALPHABETICAL.map((category) => (
               <option key={category} value={category}>
                 {category}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label>
+          Źródło
+          <select name="source" defaultValue={filters.source ?? ""}>
+            <option value="">Wszystkie</option>
+            {(Object.keys(SOURCE_LABELS) as Source[]).map((source) => (
+              <option key={source} value={source}>
+                {SOURCE_LABELS[source]}
               </option>
             ))}
           </select>
@@ -37,7 +49,7 @@ export function ItemList({ items, filters }: { items: Item[]; filters: ItemFilte
           <input type="date" name="to" defaultValue={filters.to ?? ""} />
         </label>
         <button type="submit">Filtruj</button>
-        <Link href="/">Wyczyść</Link>
+        <Link href="/panel">Wyczyść</Link>
       </form>
 
       {items.length === 0 ? (

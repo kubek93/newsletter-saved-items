@@ -14,6 +14,9 @@ export const CATEGORIES = [
 
 export type Category = (typeof CATEGORIES)[number];
 
+/** The same list as people expect to find it in a select or a filter: Polish alphabetical order. */
+export const CATEGORIES_ALPHABETICAL: readonly Category[] = [...CATEGORIES].sort((a, b) => a.localeCompare(b, "pl"));
+
 export function isCategory(value: unknown): value is Category {
   return (CATEGORIES as readonly unknown[]).includes(value);
 }

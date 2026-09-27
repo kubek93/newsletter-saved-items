@@ -13,12 +13,12 @@ describe("POST /auth/login", () => {
     const res = await login(formRequest("/auth/login", { email: OWNER, password: PASSWORD }));
 
     expect(res.status).toBe(303);
-    expect(res.headers.get("location")).toBe(`${process.env.PANEL_URL}/`);
+    expect(res.headers.get("location")).toBe(`${process.env.PANEL_URL}/panel`);
     const session = res.cookies.getAll().filter((cookie) => cookie.name.startsWith("sb-") && cookie.value !== "");
     expect(session.length).toBeGreaterThan(0);
 
     // The cookies it set are a working session: the proxy lets the browser through.
-    const inside = await proxy(panelRequest("/", session.map(({ name, value }) => ({ name, value }))));
+    const inside = await proxy(panelRequest("/panel", session.map(({ name, value }) => ({ name, value }))));
     expect(inside.status).toBe(200);
   });
 

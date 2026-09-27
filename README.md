@@ -45,9 +45,13 @@ curl -X POST http://localhost:3000/api/ingest/upload -H "Authorization: Bearer $
 
 Accepted types: JPEG, PNG, WebP, MP4, QuickTime; the Shortcut converts HEIC to JPEG first. Uploads are never deduplicated. A video above about 15 MB cannot be analysed (ADR 0005) and ends Failed. A created Item is analysed in the background: its Source is read (X posts through FxTwitter, Instagram posts and Reels through an Apify actor, web pages as Markdown through Firecrawl, YouTube links straight to the model as video; other videos are downloaded and sent inline, see ADR 0005), the content goes to the model configured in `OPENROUTER_MODEL`, and the row ends up `done` with a Polish title, description, recap and Category, or `failed` with the error text and one more attempt counted.
 
+## Public page
+
+`/` is open to everyone: every Item that has a Summary, as tiles (title, Source in grey, reading time, recap) in sections per Digest Day, newest first, with Category and Source filters that show counts (`/?category=Ceramika&source=web`). Items still Pending or Failed never appear there.
+
 ## Panel
 
-Server-rendered pages at `/`, behind Supabase Auth. Sign-in is email and password (`POST /auth/login`); only the account in `OWNER_EMAIL` gets in, any other account is signed out again with a message. `src/proxy.ts` refreshes the session cookies on every request and sends anonymous visitors to `/login`; each page then checks the allowlist with `requireOwner()`. Data is read with the service role after that check, so no RLS policies are needed for the Panel.
+Server-rendered pages at `/panel`, behind Supabase Auth. Sign-in is email and password (`POST /auth/login`); only the account in `OWNER_EMAIL` gets in, any other account is signed out again with a message. `src/proxy.ts` refreshes the session cookies on every request and sends anonymous visitors to `/login`; each page then checks the allowlist with `requireOwner()`. Data is read with the service role after that check, so no RLS policies are needed for the Panel.
 
 The Owner's account is created once through the Auth admin API (no public sign-up; turn "Allow new users to sign up" off in the Supabase dashboard). Locally:
 

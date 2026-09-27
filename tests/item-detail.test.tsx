@@ -160,7 +160,7 @@ describe("POST /items/[id]/delete", () => {
     const res = await postForm(postDelete, `/items/${id}/delete`, {});
 
     expect(res.status).toBe(303);
-    expect(res.headers.get("location")).toBe(`${process.env.PANEL_URL}/`);
+    expect(res.headers.get("location")).toBe(`${process.env.PANEL_URL}/panel`);
     expect(await allItems()).toHaveLength(0);
   });
 
