@@ -12,6 +12,7 @@ function item(overrides: Partial<Item>): Item {
     normalized_url: "https://example.com/a",
     storage_path: null,
     mime_type: null,
+    batch: null,
     status: "done",
     attempts: 1,
     title: "Tytuł",

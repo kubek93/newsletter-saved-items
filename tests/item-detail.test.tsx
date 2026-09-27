@@ -42,12 +42,12 @@ describe("ItemDetail", () => {
     expect(html).toContain("<h2>Glazura popiołowa</h2>");
     expect(html).toContain('<a href="https://example.com/glazura" rel="noreferrer">Web: https://example.com/glazura</a>');
     expect(html).toContain('<dd class="done">Gotowe</dd>');
-    expect(html).toContain('<h3>W jednym zdaniu</h3><p class="lead">Krótko.</p>');
-    expect(html).toContain("<h3>Streszczenie</h3><p>Pierwszy akapit.</p><p>Drugi akapit.</p>");
+    expect(html).toContain('<h3>Krótki opis</h3><p class="lead">Krótko.</p>');
+    expect(html).toContain("<h3>Opis</h3><p>Pierwszy akapit.</p><p>Drugi akapit.</p>");
     expect(html).toContain("<h3>Źródło</h3>");
     expect(html).toContain('<a class="link-card" href="https://example.com/glazura"');
-    expect(html.indexOf("W jednym zdaniu")).toBeLessThan(html.indexOf("Streszczenie"));
-    expect(html.indexOf("Streszczenie")).toBeLessThan(html.indexOf("<h3>Źródło</h3>"));
+    expect(html.indexOf("Krótki opis")).toBeLessThan(html.indexOf("<h3>Opis</h3>"));
+    expect(html.indexOf("<h3>Opis</h3>")).toBeLessThan(html.indexOf("<h3>Źródło</h3>"));
     expect(html).toContain('<option value="Kuchnia" selected="">Kuchnia</option>');
     expect(html).toContain("22 września 2026 12:00");
     expect(html).not.toContain("<img");
@@ -57,7 +57,7 @@ describe("ItemDetail", () => {
     const id = await insertLinkItem("https://example.com/a", DONE);
     const item = (await loadItem(id))!;
 
-    const html = renderToStaticMarkup(<ItemDetail item={item} media={null} />);
+    const html = renderToStaticMarkup(<ItemDetail item={item} media={[]} />);
 
     expect(html.match(/<option value="[^"]+"/g)).toHaveLength(CATEGORIES.length);
     expect(html).toContain('action="/items/' + id + '/category"');
@@ -65,7 +65,7 @@ describe("ItemDetail", () => {
 
   it("shows the stored error for a Failed Item", async () => {
     const id = await insertLinkItem("https://example.com/paywall", { status: "failed", attempts: 3, error: "Page returned 403: Forbidden" });
-    const html = renderToStaticMarkup(<ItemDetail item={(await loadItem(id))!} media={null} />);
+    const html = renderToStaticMarkup(<ItemDetail item={(await loadItem(id))!} media={[]} />);
 
     expect(html).toContain("Nie udało się odczytać: <code>Page returned 403: Forbidden</code>");
     expect(html).toContain('<dd class="failed">Nie odczytano</dd>');
@@ -75,8 +75,8 @@ describe("ItemDetail", () => {
     const yt = (await loadItem(await insertLinkItem("https://www.youtube.com/watch?v=jNQXAC9IVRw", DONE)))!;
     const x = (await loadItem(await insertLinkItem("https://x.com/jack/status/20", DONE)))!;
 
-    const ytHtml = renderToStaticMarkup(<ItemDetail item={yt} media={null} />);
-    const xHtml = renderToStaticMarkup(<ItemDetail item={x} media={null} />);
+    const ytHtml = renderToStaticMarkup(<ItemDetail item={yt} media={[]} />);
+    const xHtml = renderToStaticMarkup(<ItemDetail item={x} media={[]} />);
 
     expect(ytHtml).toContain('src="https://www.youtube.com/embed/jNQXAC9IVRw"');
     expect(xHtml).toContain('<blockquote class="twitter-tweet" data-dnt="true" data-lang="pl"><a href="https://twitter.com/jack/status/20">');
@@ -89,11 +89,11 @@ describe("ItemDetail", () => {
     const media = await mediaFor(item);
     const html = renderToStaticMarkup(<ItemDetail item={item} media={media} />);
 
-    expect(media?.kind).toBe("image");
+    expect(media[0].kind).toBe("image");
     expect(html).toContain('<h3>Źródło</h3>');
-    expect(html).toContain(`<img class="preview" src="${media!.url.replace(/&/g, "&amp;")}" alt=""/>`);
-    expect(media!.url).toContain("/storage/v1/object/sign/uploads/");
-    expect((await fetch(media!.url)).status).toBe(200);
+    expect(html).toContain(`<img class="preview" src="${media[0].url.replace(/&/g, "&amp;")}" alt=""/>`);
+    expect(media[0].url).toContain("/storage/v1/object/sign/uploads/");
+    expect((await fetch(media[0].url)).status).toBe(200);
   });
 
   it("previews an uploaded video with a video element", async () => {
@@ -103,7 +103,7 @@ describe("ItemDetail", () => {
     const media = await mediaFor(item);
     const html = renderToStaticMarkup(<ItemDetail item={item} media={media} />);
 
-    expect(media?.kind).toBe("video");
+    expect(media[0].kind).toBe("video");
     expect(html).toMatch(/<video class="preview" src="[^"]+" controls="" preload="metadata">/);
   });
 });
@@ -120,7 +120,7 @@ describe("POST /items/[id]/category", () => {
     expect(res.headers.get("location")).toBe(`${process.env.PANEL_URL}/items/${id}`);
     const item = (await loadItem(id))!;
     expect(item.category).toBe("Sport");
-    const html = renderToStaticMarkup(<ItemDetail item={item} media={null} />);
+    const html = renderToStaticMarkup(<ItemDetail item={item} media={[]} />);
     expect(html).toContain('<option value="Sport" selected="">Sport</option>');
     expect(html).not.toContain('<option value="Kuchnia" selected="">');
   });

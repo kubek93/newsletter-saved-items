@@ -43,6 +43,8 @@ curl -X POST http://localhost:3000/api/ingest/upload -H "Authorization: Bearer $
   -H "Content-Type: application/json" -d '{"path":"2026/09/<uuid>-IMG_0001.jpg","mimeType":"image/jpeg"}'
 ```
 
+Several files shared at once form one Item, a collection: the Shortcut registers each file with the same `batch` key (`{"path":…,"batch":"20260927131500123"}`; the first answer is `created`, the next ones `added`), then calls `POST /api/ingest/upload/done` with `{"batch":…}` so the Summary is written once every file is in. A batch stays open for 15 minutes after its first file. The photos and videos are analysed together and shown together as a gallery. The Shortcut also shrinks photos on the phone to 1600 px on the long side before uploading.
+
 Accepted types: JPEG, PNG, WebP, MP4, QuickTime; the Shortcut converts HEIC to JPEG first. Uploads are never deduplicated. An uploaded video above about 15 MB cannot be analysed (ADR 0005) and ends Failed; an X or Instagram video that large is skipped instead (X first tries a smaller variant of the same video), and the Item is summarised from the text and the thumbnail with a note that the video was not watched. A created Item is analysed in the background: its Source is read (X posts through FxTwitter, Instagram posts and Reels through an Apify actor, web pages as Markdown through Firecrawl, YouTube links straight to the model as video; other videos are downloaded and sent inline, see ADR 0005), the content goes to the model configured in `OPENROUTER_MODEL`, and the row ends up `done` with a Polish title, description, recap and Category, or `failed` with the error text and one more attempt counted.
 
 ## Public page

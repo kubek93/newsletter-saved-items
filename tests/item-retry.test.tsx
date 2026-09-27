@@ -68,8 +68,8 @@ describe("ItemDetail retry button", () => {
     const failed = await insertLinkItem(X_POST, { status: "failed", attempts: 3, error: "x" });
     const pending = await insertLinkItem("https://x.com/jack/status/21");
 
-    const failedHtml = renderToStaticMarkup(<ItemDetail item={(await loadItem(failed))!} media={null} />);
-    const pendingHtml = renderToStaticMarkup(<ItemDetail item={(await loadItem(pending))!} media={null} />);
+    const failedHtml = renderToStaticMarkup(<ItemDetail item={(await loadItem(failed))!} media={[]} />);
+    const pendingHtml = renderToStaticMarkup(<ItemDetail item={(await loadItem(pending))!} media={[]} />);
 
     expect(failedHtml).toContain(`action="/items/${failed}/retry"`);
     expect(failedHtml).toMatch(/<button type="submit">Podsumuj ponownie<\/button>/);

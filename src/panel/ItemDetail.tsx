@@ -17,9 +17,9 @@ const dateFormat = new Intl.DateTimeFormat("pl-PL", {
 });
 
 /** The Owner's page of one Item: the facts to manage it, then the same sections as the public page. */
-export function ItemDetail({ item, media }: { item: Item; media: Media | null }) {
+export function ItemDetail({ item, media }: { item: Item; media: Media[] }) {
   const heading = itemLabel(item);
-  const embed = embedFor(item, media ? { url: media.url, video: media.kind === "video" } : undefined);
+  const embed = embedFor(item, media.map((file) => ({ url: file.url, video: file.kind === "video" })));
   return (
     <article className="item">
       <p>
@@ -61,13 +61,13 @@ export function ItemDetail({ item, media }: { item: Item; media: Media | null })
 
       {item.status === "done" && item.recap && (
         <section className="block">
-          <h3>W jednym zdaniu</h3>
+          <h3>Krótki opis</h3>
           <p className="lead">{item.recap}</p>
         </section>
       )}
       {item.status === "done" && item.description && (
         <section className="block">
-          <h3>Streszczenie</h3>
+          <h3>Opis</h3>
           <Paragraphs text={item.description} />
         </section>
       )}

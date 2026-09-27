@@ -1,6 +1,7 @@
 import { isCategory, type Category } from "@/domain/category";
 import { isSource, type Item, type Source } from "@/domain/item";
 import { isVideoMimeType } from "@/domain/upload-item";
+import { listItemFiles } from "@/lib/item-files";
 import { supabaseAdmin } from "@/lib/supabase";
 import { signedUploadUrl } from "@/lib/uploads";
 
@@ -30,8 +31,8 @@ export async function listPublicItems(): Promise<PublicItem[]> {
 
 export type PublicMedia = { url: string; video: boolean };
 
-/** One done Item for its public page, with a signed URL to its file when it is an Upload. Null otherwise. */
-export async function loadPublicItem(id: string): Promise<{ item: PublicItem; media?: PublicMedia } | null> {
+/** One done Item for its public page, with signed URLs to its files when it is an Upload. Null otherwise. */
+export async function loadPublicItem(id: string): Promise<{ item: PublicItem; media?: PublicMedia[] } | null> {
   const { data, error } = await supabaseAdmin
     .from("items")
     .select("id, source, url, title, description, recap, category, digest_day, saved_at, storage_path, mime_type")
@@ -42,7 +43,11 @@ export async function loadPublicItem(id: string): Promise<{ item: PublicItem; me
   if (!data) return null;
   const { storage_path, mime_type, ...item } = data as PublicItem & { storage_path: string | null; mime_type: string | null };
   if (item.source === "upload" && storage_path) {
-    return { item, media: { url: await signedUploadUrl(storage_path), video: isVideoMimeType(mime_type ?? "") } };
+    const files = await listItemFiles({ id: item.id, storage_path, mime_type });
+    const media = await Promise.all(
+      files.map(async (file) => ({ url: await signedUploadUrl(file.path), video: isVideoMimeType(file.mime_type) })),
+    );
+    return { item, media };
   }
   return { item };
 }

@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { POST as finishUpload } from "@/app/api/ingest/upload/done/route";
 import { POST as registerUpload } from "@/app/api/ingest/upload/route";
 import { POST as requestUploadUrl } from "@/app/api/ingest/upload-url/route";
 import { MAX_INLINE_VIDEO_BYTES } from "@/readers/video";
@@ -16,12 +17,12 @@ function call(handler: (req: Request) => Promise<Response>, body: unknown, token
   return handler(new Request("http://localhost/api/ingest/upload", { method: "POST", headers, body: JSON.stringify(body) }));
 }
 
-/** What the Shortcut does: ask for a signed URL, PUT the file there, register the path. */
-async function share(filename: string, mimeType: string, bytes: Uint8Array<ArrayBuffer>) {
+/** What the Shortcut does: ask for a signed URL, PUT the file there, register the path (with the share's batch key). */
+async function share(filename: string, mimeType: string, bytes: Uint8Array<ArrayBuffer>, batch?: string) {
   const { uploadUrl, path } = await (await call(requestUploadUrl, { filename, mimeType })).json();
   const put = await fetch(uploadUrl, { method: "PUT", body: new Blob([bytes], { type: mimeType }) });
   expect(put.status).toBe(200);
-  const res = await call(registerUpload, { path });
+  const res = await call(registerUpload, batch ? { path, batch } : { path });
   return { res, path };
 }
 
@@ -130,6 +131,39 @@ describe("file upload through signed URLs", () => {
 
     expect(again.status).toBe(201);
     expect(await allItems()).toHaveLength(2);
+  });
+
+  it("groups the files of one share into one Item and summarises them together on done", async () => {
+    const requests: OpenRouterRequest[] = [];
+    network.use(openrouterCaptures(requests));
+
+    const first = await share("IMG_1.jpg", "image/jpeg", JPEG, "20260927131500123");
+    const second = await share("IMG_2.jpg", "image/jpeg", JPEG, "20260927131500123");
+
+    expect(first.res.status).toBe(201);
+    const { id } = await first.res.json();
+    expect(second.res.status).toBe(200);
+    expect(await second.res.json()).toEqual({ status: "added", id });
+    expect(await allItems()).toHaveLength(1);
+    expect((await getItem(id)).status).toBe("pending");
+    expect(requests).toHaveLength(0);
+
+    const done = await call(finishUpload, { batch: "20260927131500123" });
+
+    expect(done.status).toBe(202);
+    expect(await done.json()).toEqual({ status: "queued", id });
+    await waitUntilSummarized();
+    expect((await getItem(id)).status).toBe("done");
+    const content = userContent(requests[0]);
+    expect(content.map((part) => part.type)).toEqual(["text", "image_url", "image_url"]);
+    expect(JSON.stringify(content[0])).toContain("Kolekcja 2 plików");
+    expect((content[1].image_url as { url: string }).url).toContain(first.path);
+    expect((content[2].image_url as { url: string }).url).toContain(second.path);
+  });
+
+  it("answers 404 for done with a batch nobody registered, and 400 without one", async () => {
+    expect((await call(finishUpload, { batch: "nope" })).status).toBe(404);
+    expect((await call(finishUpload, {})).status).toBe(400);
   });
 
   it("keeps the bucket private", async () => {

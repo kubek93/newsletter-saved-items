@@ -11,7 +11,7 @@ export default async function PublicItemPage({ params }: { params: Promise<{ id:
   const { item, media } = loaded;
   return (
     <main className="public">
-      <PublicItemView item={item} embed={embedFor(item, media)} openUrl={item.url ?? media?.url ?? null} />
+      <PublicItemView item={item} embed={embedFor(item, media)} openUrl={item.url ?? media?.[0]?.url ?? null} />
     </main>
   );
 }

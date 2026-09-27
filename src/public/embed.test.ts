@@ -31,9 +31,10 @@ describe("embedFor", () => {
     });
   });
 
-  it("shows an Upload as its file, or nothing without a signed URL", () => {
-    expect(embedFor({ source: "upload", url: null }, { url: "https://s/x.jpg?token=1", video: false })).toEqual({ kind: "image", url: "https://s/x.jpg?token=1" });
-    expect(embedFor({ source: "upload", url: null }, { url: "https://s/x.mp4?token=1", video: true })).toEqual({ kind: "video", url: "https://s/x.mp4?token=1" });
+  it("shows an Upload as its files, or nothing without signed URLs", () => {
+    const files = [{ url: "https://s/x.jpg?token=1", video: false }, { url: "https://s/x.mp4?token=1", video: true }];
+    expect(embedFor({ source: "upload", url: null }, files)).toEqual({ kind: "files", files });
+    expect(embedFor({ source: "upload", url: null }, [])).toBeNull();
     expect(embedFor({ source: "upload", url: null })).toBeNull();
   });
 });

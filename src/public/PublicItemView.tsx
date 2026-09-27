@@ -29,14 +29,14 @@ export function PublicItemView({ item, embed, openUrl }: { item: PublicItem; emb
 
       {item.recap && (
         <section className="block">
-          <h2>W jednym zdaniu</h2>
+          <h2>Krótki opis</h2>
           <p className="lead">{item.recap}</p>
         </section>
       )}
 
       {item.description && (
         <section className="block">
-          <h2>Streszczenie</h2>
+          <h2>Opis</h2>
           <Paragraphs text={item.description} />
         </section>
       )}

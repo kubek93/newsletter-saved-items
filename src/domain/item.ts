@@ -17,8 +17,11 @@ export type Item = {
   source: Source;
   url: string | null;
   normalized_url: string | null;
+  /** For an Upload: the first file; the whole collection is in `item_files`. */
   storage_path: string | null;
   mime_type: string | null;
+  /** The share this Upload came from, so the next files of the same share join it. */
+  batch: string | null;
   status: Status;
   attempts: number;
   saved_at: string;

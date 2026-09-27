@@ -27,12 +27,16 @@ export function uploadFilename(storagePath: string): string {
   return storagePath.slice(storagePath.lastIndexOf("/") + 1 + UUID_LENGTH + 1);
 }
 
-/** The row to insert for a file the Shortcut has just put into Storage. Uploads are never deduplicated. */
-export function newUploadItem(storagePath: string, mimeType: UploadMimeType, savedAt = new Date()) {
+/**
+ * The row to insert for the first file the Shortcut has just put into Storage. Uploads are never
+ * deduplicated. `batch` is the share's key when more files of the same share may follow.
+ */
+export function newUploadItem(storagePath: string, mimeType: UploadMimeType, savedAt = new Date(), batch: string | null = null) {
   return {
     source: "upload" as const,
     storage_path: storagePath,
     mime_type: mimeType,
+    batch,
     saved_at: savedAt.toISOString(),
     digest_day: digestDayFor(savedAt),
   };
