@@ -19,12 +19,14 @@ export async function POST(request: Request) {
   const body = await readJson<{ url?: unknown }>(request);
   const url = firstUrl(body?.url);
   if (url === null) {
+    console.warn("ingest/link refused: no url in", describeBody(body, request));
     return Response.json({ error: "missing url" }, { status: 400 });
   }
   let row: ReturnType<typeof newLinkItem>;
   try {
     row = newLinkItem(url);
   } catch {
+    console.warn("ingest/link refused: invalid url in", describeBody(body, request));
     return Response.json({ error: "invalid url" }, { status: 400 });
   }
 
@@ -46,4 +48,10 @@ export async function POST(request: Request) {
     .single();
   if (existing.error) throw existing.error;
   return Response.json({ status: "duplicate", id: existing.data.id }, { status: 200 });
+}
+
+/** What a refused request carried, for the runtime log: the Shortcut shows "Zapisano" whatever the answer. */
+function describeBody(body: unknown, request: Request): string {
+  const json = body === null ? "not JSON" : JSON.stringify(body).slice(0, 300);
+  return `${json} (content-type: ${request.headers.get("content-type") ?? "none"})`;
 }
