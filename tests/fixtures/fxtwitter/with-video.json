@@ -7,7 +7,10 @@
     "text": "Watch the full launch sequence from this morning's Artemis test. Sound on.",
     "raw_text": {
       "text": "Watch the full launch sequence from this morning's Artemis test. Sound on.",
-      "display_text_range": [0, 74],
+      "display_text_range": [
+        0,
+        74
+      ],
       "facets": []
     },
     "author": {
@@ -52,7 +55,28 @@
           "width": 1280,
           "height": 720,
           "format": "video/mp4",
-          "variants": []
+          "variants": [
+            {
+              "bitrate": 0,
+              "content_type": "application/x-mpegURL",
+              "url": "https://video.twimg.com/amplify_video/1900000000000000000/pl/PlAyLiSt.m3u8?tag=16"
+            },
+            {
+              "bitrate": 432000,
+              "content_type": "video/mp4",
+              "url": "https://video.twimg.com/amplify_video/1900000000000000000/vid/avc1/320x180/SmAlL.mp4?tag=16"
+            },
+            {
+              "bitrate": 2176000,
+              "content_type": "video/mp4",
+              "url": "https://video.twimg.com/amplify_video/1900000000000000000/vid/avc1/1280x720/AbCdEfGh.mp4?tag=16"
+            },
+            {
+              "bitrate": 8768000,
+              "content_type": "video/mp4",
+              "url": "https://video.twimg.com/amplify_video/1900000000000000000/vid/avc1/1920x1080/BiGgEsT.mp4?tag=16"
+            }
+          ]
         }
       ],
       "videos": [
@@ -64,7 +88,28 @@
           "width": 1280,
           "height": 720,
           "format": "video/mp4",
-          "variants": []
+          "variants": [
+            {
+              "bitrate": 0,
+              "content_type": "application/x-mpegURL",
+              "url": "https://video.twimg.com/amplify_video/1900000000000000000/pl/PlAyLiSt.m3u8?tag=16"
+            },
+            {
+              "bitrate": 432000,
+              "content_type": "video/mp4",
+              "url": "https://video.twimg.com/amplify_video/1900000000000000000/vid/avc1/320x180/SmAlL.mp4?tag=16"
+            },
+            {
+              "bitrate": 2176000,
+              "content_type": "video/mp4",
+              "url": "https://video.twimg.com/amplify_video/1900000000000000000/vid/avc1/1280x720/AbCdEfGh.mp4?tag=16"
+            },
+            {
+              "bitrate": 8768000,
+              "content_type": "video/mp4",
+              "url": "https://video.twimg.com/amplify_video/1900000000000000000/vid/avc1/1920x1080/BiGgEsT.mp4?tag=16"
+            }
+          ]
         }
       ]
     },

@@ -25,7 +25,34 @@ export function assertVideosFitInline(parts: ContentPart[]): void {
 }
 
 /** The error stored on an Item whose video cannot be sent; the same wording wherever the limit bites. */
-export function videoTooLarge(bytes: number): Error {
-  const mb = (bytes / 1024 / 1024).toFixed(1);
-  return new Error(`Video too large to send to the model inline: ${mb} MB`);
+export class VideoTooLargeError extends Error {
+  constructor(readonly bytes: number) {
+    super(`Video too large to send to the model inline: ${megabytes(bytes)} MB`);
+  }
+}
+
+export function videoTooLarge(bytes: number): VideoTooLargeError {
+  return new VideoTooLargeError(bytes);
+}
+
+function megabytes(bytes: number): string {
+  return (bytes / 1024 / 1024).toFixed(1);
+}
+
+/**
+ * The video inline or, when it will not fit, a note telling the model the video was skipped, with its thumbnail
+ * when there is one. The Item is then summarised from what remains (post text, caption, cover) and the
+ * Summary says the video was not watched, instead of the Item ending Failed.
+ */
+export async function videoOrNote(url: string, thumbnailUrl?: string): Promise<ContentPart[]> {
+  try {
+    return [await downloadVideo(url)];
+  } catch (cause) {
+    if (!(cause instanceof VideoTooLargeError)) throw cause;
+    const note: ContentPart = {
+      type: "text",
+      text: `Wideo z tego materiału (${megabytes(cause.bytes)} MB) jest za duże, by je obejrzeć, i zostało pominięte. Opisz materiał na podstawie pozostałej treści i zaznacz w streszczeniu, że wideo nie zostało przeanalizowane.`,
+    };
+    return thumbnailUrl ? [note, { type: "image", url: thumbnailUrl }] : [note];
+  }
 }

@@ -103,19 +103,23 @@ describe("summarizeItem for Instagram", () => {
     expect(item.error).toContain("hard limit");
   });
 
-  it("marks the Item Failed when the Reel is too large to send inline", async () => {
+  it("summarises a Reel from its caption and cover, with a note, when the video is too large to send inline", async () => {
+    const requests: OpenRouterRequest[] = [];
     network.use(
       apifyAnswers("reel"),
       videoFileAnswers(REEL_VIDEO_URL, REEL_BYTES, MAX_INLINE_VIDEO_BYTES + 1),
-      openrouterAnswers(),
+      openrouterCaptures(requests),
     );
     const id = await insertPendingLink("https://www.instagram.com/reel/C2reelXYZ1/");
 
     await summarizeItem(id);
 
-    const item = await getItem(id);
-    expect(item).toMatchObject({ status: "failed", attempts: 1 });
-    expect(item.error).toContain("too large");
+    expect(await getItem(id)).toMatchObject({ status: "done", attempts: 1, error: null });
+    const content = userContent(requests[0]);
+    expect(content.map((part) => part.type)).toEqual(["text", "text", "image_url"]);
+    expect(JSON.stringify(content[1])).toContain("pominięte");
+    expect(content[2]).toEqual({ type: "image_url", image_url: { url: "https://scontent-waw2-1.cdninstagram.com/v/t51.2885-15/567890123_2345678901_n.jpg" } });
+    expect(requests[0].provider).toBeUndefined();
   });
 
   it("sends the actor id and token from configuration", async () => {
