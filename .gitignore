@@ -11,3 +11,5 @@ next-env.d.ts
 supabase/.temp/
 supabase/.branches/
 !.env.test
+# Signed Shortcuts embed INGEST_TOKEN; build them with shortcuts/build.py
+shortcuts/*.shortcut

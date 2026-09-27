@@ -43,9 +43,20 @@ curl -X POST http://localhost:3000/api/ingest/upload -H "Authorization: Bearer $
   -H "Content-Type: application/json" -d '{"path":"2026/09/<uuid>-IMG_0001.jpg","mimeType":"image/jpeg"}'
 ```
 
-Several files shared at once form one Item, a collection: the Shortcut registers each file with the same `batch` key (`{"path":…,"batch":"20260927131500123"}`; the first answer is `created`, the next ones `added`), then calls `POST /api/ingest/upload/done` with `{"batch":…}` so the Summary is written once every file is in. A batch stays open for 15 minutes after its first file. The photos and videos are analysed together and shown together as a gallery. The Shortcut also shrinks photos on the phone to 1600 px on the long side before uploading.
+Several files shared at once form one Item, a collection: the Shortcut registers each file with the same `batch` key (`{"path":…,"batch":"IMG_0073_IMG_0074_IMG_0075"}`, the name iOS gives the whole share; the first answer is `created`, the next ones `added`), then calls `POST /api/ingest/upload/done` with `{"batch":…}` so the Summary is written once every file is in. A batch stays open for 15 minutes after its first file. The photos and videos are analysed together and shown together as a gallery. Registering an empty file answers 400.
 
 Accepted types: JPEG, PNG, WebP, MP4, QuickTime; the Shortcut converts HEIC to JPEG first. Uploads are never deduplicated. An uploaded video above about 15 MB cannot be analysed (ADR 0005) and ends Failed; an X or Instagram video that large is skipped instead (X first tries a smaller variant of the same video), and the Item is summarised from the text and the thumbnail with a note that the video was not watched. A created Item is analysed in the background: its Source is read (X posts through FxTwitter, Instagram posts and Reels through an Apify actor, web pages as Markdown through Firecrawl, YouTube links straight to the model as video; other videos are downloaded and sent inline, see ADR 0005), the content goes to the model configured in `OPENROUTER_MODEL`, and the row ends up `done` with a Polish title, description, recap and Category, or `failed` with the error text and one more attempt counted.
+
+## Shortcuts
+
+The three iOS Shortcuts ("Nuska Zapisz link", "Nuska Zapisz zdjęcie", "Nuska Zapisz wideo") are generated, not hand-made, so the token and the address live in one place:
+
+```
+python3 shortcuts/build.py            # reads INGEST_TOKEN from .env, signs with the macOS `shortcuts` tool
+python3 shortcuts/build.py --base https://staging.example --out /tmp/shortcuts
+```
+
+The signed files land in `shortcuts/` (ignored by git, because they embed the token) and in `~/Downloads`; AirDrop them to the phone, open each once to import, then they appear in the share sheet. The link Shortcut sends the shared text as it is; the photo Shortcut converts every photo to JPEG at quality 0.7 and registers them as one collection; the video Shortcut sends one file. The comments at the end of `shortcuts/build.py` list which Shortcuts actions do and do not work on the Owner's device.
 
 ## Public page
 
