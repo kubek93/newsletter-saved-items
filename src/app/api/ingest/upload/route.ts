@@ -34,6 +34,10 @@ export async function POST(request: Request) {
   if (!isUploadMimeType(file.contentType)) {
     return Response.json({ error: `unsupported file type ${file.contentType}` }, { status: 400 });
   }
+  // A Shortcut whose file variable came out empty PUTs zero bytes; such an Item could never be analysed.
+  if (!file.size) {
+    return Response.json({ error: "empty file" }, { status: 400 });
+  }
 
   const itemFile = { path: body.path, mime_type: file.contentType };
   const open = batch ? await openBatchItem(batch) : null;
