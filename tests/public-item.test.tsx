@@ -70,10 +70,9 @@ describe("PublicItemView", () => {
     const xHtml = renderToStaticMarkup(<PublicItemView item={x} embed={embedFor(x)} openUrl={x.url} />);
     const igHtml = renderToStaticMarkup(<PublicItemView item={ig} embed={embedFor(ig)} openUrl={ig.url} />);
 
-    expect(xHtml).toContain('<blockquote class="twitter-tweet"><a href="https://x.com/jack/status/20">');
-    expect(xHtml).toContain('src="https://platform.twitter.com/widgets.js"');
+    expect(xHtml).toContain('<blockquote class="twitter-tweet" data-dnt="true" data-lang="pl"><a href="https://twitter.com/jack/status/20">');
     expect(igHtml).toContain('data-instgrm-permalink="https://www.instagram.com/reel/abc/"');
-    expect(igHtml).toContain('src="https://www.instagram.com/embed.js"');
+    expect(igHtml).toContain('<blockquote class="instagram-media" data-instgrm-permalink="https://www.instagram.com/reel/abc/"');
   });
 
   it("shows a link card for an ordinary page and the file itself for an Upload", async () => {

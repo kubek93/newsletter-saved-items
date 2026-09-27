@@ -79,8 +79,7 @@ describe("ItemDetail", () => {
     const xHtml = renderToStaticMarkup(<ItemDetail item={x} media={null} />);
 
     expect(ytHtml).toContain('src="https://www.youtube.com/embed/jNQXAC9IVRw"');
-    expect(xHtml).toContain('<blockquote class="twitter-tweet">');
-    expect(xHtml).toContain('src="https://platform.twitter.com/widgets.js"');
+    expect(xHtml).toContain('<blockquote class="twitter-tweet" data-dnt="true" data-lang="pl"><a href="https://twitter.com/jack/status/20">');
   });
 
   it("previews an uploaded photo through a signed Storage URL", async () => {
