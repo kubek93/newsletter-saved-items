@@ -1,5 +1,20 @@
 import { describe, expect, it } from "vitest";
-import { normalizeUrl } from "./url";
+import { firstUrl, normalizeUrl } from "./url";
+
+describe("firstUrl", () => {
+  it.each([
+    ["a plain string", "https://example.com/a", "https://example.com/a"],
+    ["a list, as the Shortcut sends it", ["https://example.com/a", "https://example.com/b"], "https://example.com/a"],
+    ["a list with an empty first entry", ["", "https://example.com/b"], "https://example.com/b"],
+    ["text around the link", "Zobacz: https://example.com/a?x=1 super", "https://example.com/a?x=1"],
+    ["nothing link-like", "just text", null],
+    ["an empty list", [], null],
+    ["a number", 42, null],
+    ["undefined", undefined, null],
+  ])("%s", (_name, value, expected) => {
+    expect(firstUrl(value)).toBe(expected);
+  });
+});
 
 describe("normalizeUrl", () => {
   it.each([

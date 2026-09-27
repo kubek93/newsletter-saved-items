@@ -74,6 +74,16 @@ describe("POST /api/ingest/link", () => {
     expect(await allItems()).toHaveLength(1);
   });
 
+  it("takes the link out of a list or text, as the Shortcut sends it", async () => {
+    const fromList = await post({ url: ["https://x.com/jack/status/20"] });
+    expect(fromList.status).toBe(201);
+
+    const fromText = await post({ url: "Zobacz https://example.com/artykul dziś" });
+    expect(fromText.status).toBe(201);
+
+    expect((await allItems()).map((i) => i.url).sort()).toEqual(["https://example.com/artykul", "https://x.com/jack/status/20"]);
+  });
+
   it("rejects a body without a valid http(s) url", async () => {
     expect((await post({ url: "not a url" })).status).toBe(400);
     expect((await post({ url: "ftp://example.com/x" })).status).toBe(400);
