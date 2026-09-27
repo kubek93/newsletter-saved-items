@@ -2,7 +2,9 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { accessFor, loginPath } from "@/panel/owner";
 
+/** The public page at the root, sign-in and the auth routes need no session. */
 const OPEN_PATHS = ["/login", "/auth/"];
+const isOpen = (pathname: string) => pathname === "/" || OPEN_PATHS.some((open) => pathname.startsWith(open));
 
 /**
  * Runs before every Panel page: refreshes the Supabase session cookies, sends anyone without a session
@@ -35,7 +37,7 @@ export async function proxy(request: NextRequest) {
     for (const cookie of response.cookies.getAll()) refused.cookies.set(cookie);
     return refused;
   }
-  if (access.access === "anonymous" && !OPEN_PATHS.some((open) => pathname.startsWith(open))) {
+  if (access.access === "anonymous" && !isOpen(pathname)) {
     return NextResponse.redirect(new URL(loginPath(), request.url));
   }
   return response;

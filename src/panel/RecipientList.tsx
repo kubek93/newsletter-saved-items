@@ -14,7 +14,7 @@ export function RecipientList({ recipients, outcome, attempted }: { recipients: 
   return (
     <section>
       <p>
-        <Link href="/">← Lista</Link>
+        <Link href="/panel">← Lista</Link>
       </p>
       <h2>Odbiorcy Digestu</h2>
 

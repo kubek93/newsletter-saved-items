@@ -1,21 +1,29 @@
 import { isCategory, type Category } from "@/domain/category";
 import { isDigestDay } from "@/domain/digest-day";
-import type { Item } from "@/domain/item";
+import type { Item, Source } from "@/domain/item";
 import { isVideoMimeType } from "@/domain/upload-item";
 import { supabaseAdmin } from "@/lib/supabase";
 import { signedUploadUrl, uploadsBucket } from "@/lib/uploads";
 
 /** What the Item list can be narrowed to. Dates are Digest Days (YYYY-MM-DD), inclusive. */
-export type ItemFilters = { category?: Category; from?: string; to?: string };
+export type ItemFilters = { category?: Category; source?: Source; from?: string; to?: string };
+
+const SOURCES: readonly Source[] = ["x", "instagram", "web", "upload"];
+
+export function isSource(value: unknown): value is Source {
+  return (SOURCES as readonly unknown[]).includes(value);
+}
 
 /** Filters out of the page's query string; anything malformed is ignored rather than refused. */
 export function parseFilters(params: Record<string, string | string[] | undefined>): ItemFilters {
   const single = (key: string) => (Array.isArray(params[key]) ? params[key][0] : params[key]);
   const category = single("category");
+  const source = single("source");
   const from = single("from");
   const to = single("to");
   return {
     category: isCategory(category) ? category : undefined,
+    source: isSource(source) ? source : undefined,
     from: isDigestDay(from) ? from : undefined,
     to: isDigestDay(to) ? to : undefined,
   };
@@ -25,6 +33,7 @@ export function parseFilters(params: Record<string, string | string[] | undefine
 export async function listItems(filters: ItemFilters): Promise<Item[]> {
   let query = supabaseAdmin.from("items").select("*").order("saved_at", { ascending: false });
   if (filters.category) query = query.eq("category", filters.category);
+  if (filters.source) query = query.eq("source", filters.source);
   if (filters.from) query = query.gte("digest_day", filters.from);
   if (filters.to) query = query.lte("digest_day", filters.to);
   const { data, error } = await query;

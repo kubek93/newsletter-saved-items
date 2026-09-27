@@ -1,28 +1,24 @@
 import Link from "next/link";
-import { requireOwner } from "@/panel/auth";
-import { ItemList } from "@/panel/ItemList";
-import { listItems, parseFilters } from "@/panel/items";
+import { Browse } from "@/public/BrowseView";
+import { listPublicItems, parseBrowseFilters } from "@/public/browse";
 
-export default async function ItemsPage({
+/** Open to everyone: what was saved, once the Summary exists. */
+export default async function PublicPage({
   searchParams,
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  const email = await requireOwner();
-  const filters = parseFilters(await searchParams);
-  const items = await listItems(filters);
+  const filters = parseBrowseFilters(await searchParams);
+  const items = await listPublicItems();
   return (
-    <main>
+    <main className="public">
       <header className="topbar">
         <h1>Zapisane</h1>
         <nav>
-          <Link href="/recipients">Odbiorcy</Link>
+          <Link href="/panel">Panel</Link>
         </nav>
-        <form method="post" action="/auth/logout">
-          <span>{email}</span> <button type="submit">Wyloguj</button>
-        </form>
       </header>
-      <ItemList items={items} filters={filters} />
+      <Browse items={items} filters={filters} />
     </main>
   );
 }

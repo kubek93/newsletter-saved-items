@@ -17,5 +17,5 @@ export async function POST(request: NextRequest) {
     await supabase.auth.signOut();
     return redirectTo(loginPath("refused"));
   }
-  return redirectTo("/");
+  return redirectTo("/panel");
 }

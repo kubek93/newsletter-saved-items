@@ -78,7 +78,7 @@ describe("ItemList", () => {
     const html = renderToStaticMarkup(<ItemList items={await listItems(filters)} filters={filters} />);
 
     expect(html).toMatch(/<form[^>]*method="get"/);
-    expect(html).toMatch(/<form[^>]*action="\/"/);
+    expect(html).toMatch(/<form[^>]*action="\/panel"/);
     expect(html).toContain('<option value="Ceramika" selected="">Ceramika</option>');
     expect(html).toContain('name="from" value="2026-09-01"');
     expect(html).toContain('name="to" value="2026-09-30"');

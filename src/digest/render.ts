@@ -69,7 +69,7 @@ export function renderDigest(digestDay: string, items: Item[], panelUrl: string)
 <h1>Zapisane: ${escape(dateLabel)}</h1>
 <p>${items.length ? `Zapisane tego dnia: ${count}.` : "Pusty Digest."}</p>
 ${body}
-<p style="color: #777; font-size: 12px;">Codzienny Digest z rzeczy zapisanych przez właściciela. <a href="${escape(panelUrl)}">Panel</a></p>
+<p style="color: #777; font-size: 12px;">Codzienny Digest z rzeczy zapisanych przez właściciela. <a href="${escape(panelUrl)}">Wszystkie zapisane rzeczy</a></p>
 </body>
 </html>`;
 
