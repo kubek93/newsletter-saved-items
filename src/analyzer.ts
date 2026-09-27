@@ -6,12 +6,12 @@ import { assertVideosFitInline } from "@/readers/video";
 
 const OPENROUTER_API = "https://openrouter.ai/api/v1/chat/completions";
 
-const INSTRUCTIONS = `Dostajesz treść zapisanego materiału: post z X, post z Instagrama, stronę www, wideo lub zdjęcie. Treść może być w dowolnym języku.
+const INSTRUCTIONS = `Dostajesz treść zapisanego materiału: post z X, post z Instagrama, stronę www, wideo, zdjęcie lub kolekcję zdjęć i wideo udostępnionych razem. Treść może być w dowolnym języku.
 
 Odpowiadasz wyłącznie po polsku, w formacie JSON z polami:
 - "title": chwytliwy tytuł (do 80 znaków), który jednocześnie mówi, czym ten materiał jest (np. "Ramen w 30 minut: przepis z Instagrama krok po kroku").
 - "recap": dokładnie jedno zdanie wyjaśniające, czego materiał dotyczy i co z niego wynika; będzie widoczne pod tytułem na liście.
-- "description": streszczenie o długości dopasowanej do złożoności materiału: jeden krótki akapit dla prostego posta lub zdjęcia, kilka akapitów dla artykułu czy dłuższego wideo. Ma pozwolić zrozumieć dokładnie, o czym to jest, z konkretami (nazwy, liczby, wnioski), bez lania wody.
+- "description": opis o długości dopasowanej do złożoności materiału: jeden krótki akapit dla prostego posta lub zdjęcia, kilka akapitów dla artykułu czy dłuższego wideo. Ma pozwolić zrozumieć dokładnie, o czym to jest, z konkretami (nazwy, liczby, wnioski), bez lania wody. Dla kategorii "Memy" wystarczy jedno lub dwa zdania: o co chodzi w żarcie.
 - "category": dokładnie jedna z: ${CATEGORIES.map((c) => `"${c}"`).join(", ")}. "Inne" tylko, gdy nic innego nie pasuje.
 
 Nie dopisuj niczego poza JSON-em.`;

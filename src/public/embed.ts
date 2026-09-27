@@ -1,11 +1,11 @@
-import type { PublicItem } from "./browse";
+import type { PublicItem, PublicMedia } from "./browse";
 
 export type Embed =
   | { kind: "youtube"; videoId: string }
   | { kind: "x"; url: string }
   | { kind: "instagram"; url: string }
-  | { kind: "image"; url: string }
-  | { kind: "video"; url: string }
+  /** An Upload: its photos and videos, one or a whole collection. */
+  | { kind: "files"; files: PublicMedia[] }
   | { kind: "link"; url: string; host: string };
 
 /** The id of a YouTube video link (watch, Shorts, youtu.be), or null for anything else. */
@@ -20,11 +20,11 @@ export function youtubeId(url: string): string | null {
 
 /**
  * How the source is shown on the Item's public page: the platform's own embed for X, Instagram and
- * YouTube, the file itself for an Upload (`mediaUrl` is its signed URL), a link card for any other page.
+ * YouTube, the files themselves for an Upload (`media` holds their signed URLs), a link card for any other page.
  */
-export function embedFor(item: Pick<PublicItem, "source" | "url">, mediaUrl?: { url: string; video: boolean }): Embed | null {
+export function embedFor(item: Pick<PublicItem, "source" | "url">, media?: PublicMedia[]): Embed | null {
   if (item.source === "upload") {
-    return mediaUrl ? { kind: mediaUrl.video ? "video" : "image", url: mediaUrl.url } : null;
+    return media?.length ? { kind: "files", files: media } : null;
   }
   if (!item.url) return null;
   if (item.source === "x") return { kind: "x", url: item.url };

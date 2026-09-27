@@ -31,9 +31,9 @@ describe("loadPublicItem", () => {
 
     const loaded = await loadPublicItem(data!.id);
 
-    expect(loaded?.media?.video).toBe(false);
-    expect(loaded?.media?.url).toContain("/storage/v1/object/sign/uploads/");
-    expect((await fetch(loaded!.media!.url)).status).toBe(200);
+    expect(loaded?.media?.[0].video).toBe(false);
+    expect(loaded?.media?.[0].url).toContain("/storage/v1/object/sign/uploads/");
+    expect((await fetch(loaded!.media![0].url)).status).toBe(200);
   });
 });
 
@@ -50,9 +50,9 @@ describe("PublicItemView", () => {
       '<span class="badge">▶️ YouTube</span>',
       '<span class="badge">📌 Inne</span>',
       "<h1>Szkliwo: jak działa</h1>",
-      "<h2>W jednym zdaniu</h2>",
+      "<h2>Krótki opis</h2>",
       '<p class="lead">Szkliwo to szklista powłoka chroniąca ceramikę.</p>',
-      "<h2>Streszczenie</h2>",
+      "<h2>Opis</h2>",
       "<p>Pierwszy akapit.</p><p>Drugi akapit.</p>",
       "<h2>Źródło</h2>",
       'src="https://www.youtube.com/embed/jNQXAC9IVRw"',
@@ -81,9 +81,14 @@ describe("PublicItemView", () => {
     expect(pageHtml).toContain('<span class="host">example.com</span>');
 
     const upload = { ...page, source: "upload" as const, url: null };
-    const media = { url: "https://storage.example/x.mp4?token=1", video: true };
-    const uploadHtml = renderToStaticMarkup(<PublicItemView item={upload} embed={embedFor(upload, media)} openUrl={media.url} />);
+    const media = [{ url: "https://storage.example/x.mp4?token=1", video: true }];
+    const uploadHtml = renderToStaticMarkup(<PublicItemView item={upload} embed={embedFor(upload, media)} openUrl={media[0].url} />);
     expect(uploadHtml).toMatch(/<video class="preview" src="https:\/\/storage.example\/x.mp4\?token=1" controls=""/);
+    expect(uploadHtml).not.toContain('class="gallery"');
     expect(uploadHtml).toContain("Otwórz plik");
+
+    const collection = [{ url: "https://storage.example/a.jpg?token=1", video: false }, { url: "https://storage.example/b.jpg?token=2", video: false }];
+    const galleryHtml = renderToStaticMarkup(<PublicItemView item={upload} embed={embedFor(upload, collection)} openUrl={collection[0].url} />);
+    expect(galleryHtml).toContain('<div class="gallery"><img class="preview" src="https://storage.example/a.jpg?token=1" alt=""/><img class="preview" src="https://storage.example/b.jpg?token=2" alt=""/></div>');
   });
 });

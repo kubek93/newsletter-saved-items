@@ -29,11 +29,19 @@ export function SourceEmbed({ embed }: { embed: Embed }) {
     case "x":
     case "instagram":
       return <PlatformEmbed kind={embed.kind} url={embed.url} />;
-    case "image":
-      // eslint-disable-next-line @next/next/no-img-element -- a signed Storage URL, not an optimisable asset
-      return <img className="preview" src={embed.url} alt="" />;
-    case "video":
-      return <video className="preview" src={embed.url} controls preload="metadata" />;
+    case "files":
+      return (
+        <div className={embed.files.length > 1 ? "gallery" : undefined}>
+          {embed.files.map((file, index) =>
+            file.video ? (
+              <video key={index} className="preview" src={file.url} controls preload="metadata" />
+            ) : (
+              // eslint-disable-next-line @next/next/no-img-element -- a signed Storage URL, not an optimisable asset
+              <img key={index} className="preview" src={file.url} alt="" />
+            ),
+          )}
+        </div>
+      );
     case "link":
       return (
         <a className="link-card" href={embed.url} rel="noreferrer" target="_blank">

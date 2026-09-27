@@ -2,6 +2,7 @@ import { isCategory, type Category } from "@/domain/category";
 import { isDigestDay } from "@/domain/digest-day";
 import { isSource, type Item, type Source } from "@/domain/item";
 import { isVideoMimeType } from "@/domain/upload-item";
+import { listItemFiles } from "@/lib/item-files";
 import { supabaseAdmin } from "@/lib/supabase";
 import { signedUploadUrl, uploadsBucket } from "@/lib/uploads";
 
@@ -43,10 +44,13 @@ export async function loadItem(id: string): Promise<Item | null> {
 
 export type Media = { kind: "image" | "video"; url: string };
 
-/** For an Upload: a short-lived signed URL to show the file in the Panel. Null for link Items. */
-export async function mediaFor(item: Item): Promise<Media | null> {
-  if (item.source !== "upload" || !item.storage_path) return null;
-  return { kind: isVideoMimeType(item.mime_type ?? "") ? "video" : "image", url: await signedUploadUrl(item.storage_path) };
+/** For an Upload: short-lived signed URLs to show its files in the Panel. Empty for link Items. */
+export async function mediaFor(item: Item): Promise<Media[]> {
+  if (item.source !== "upload" || !item.storage_path) return [];
+  const files = await listItemFiles(item);
+  return Promise.all(
+    files.map(async (file) => ({ kind: isVideoMimeType(file.mime_type) ? ("video" as const) : ("image" as const), url: await signedUploadUrl(file.path) })),
+  );
 }
 
 /** The Owner overrides the model's pick. False when there is no such Item. */
