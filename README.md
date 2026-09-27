@@ -27,7 +27,7 @@ curl -X POST http://localhost:3000/api/ingest/link \
   -d '{"url":"https://x.com/someone/status/123"}'
 ```
 
-The response is `{"status":"created","id":"..."}` the first time and `{"status":"duplicate","id":"..."}` afterwards.
+The response is `{"status":"created","id":"..."}` the first time and `{"status":"duplicate","id":"..."}` afterwards. `url` may also be a list of links or a text containing one (that is what the Shortcut's "Get URLs from Input" produces); the first link wins.
 
 Save a photo or video (what the Shortcut does in three calls; the file never passes through Vercel, ADR 0004):
 

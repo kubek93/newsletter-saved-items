@@ -1,4 +1,5 @@
 import { newLinkItem } from "@/domain/link-item";
+import { firstUrl } from "@/domain/url";
 import { afterResponse } from "@/lib/after-response";
 import { isAuthorized } from "@/lib/ingest-auth";
 import { readJson } from "@/lib/read-json";
@@ -16,12 +17,13 @@ export async function POST(request: Request) {
   }
 
   const body = await readJson<{ url?: unknown }>(request);
-  if (typeof body?.url !== "string") {
+  const url = firstUrl(body?.url);
+  if (url === null) {
     return Response.json({ error: "missing url" }, { status: 400 });
   }
   let row: ReturnType<typeof newLinkItem>;
   try {
-    row = newLinkItem(body.url);
+    row = newLinkItem(url);
   } catch {
     return Response.json({ error: "invalid url" }, { status: 400 });
   }
