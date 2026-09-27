@@ -8,7 +8,7 @@ import { embedFor } from "@/public/embed";
 import { PublicItemView } from "@/public/PublicItemView";
 import { clearItems, insertLinkItem } from "./items";
 
-const DONE = { status: "done" as const, title: "Szkliwo: jak działa", description: "Pierwszy akapit.\n\nDrugi akapit.", recap: "Szkliwo to szklista powłoka chroniąca ceramikę.", category: "Ceramika" as const };
+const DONE = { status: "done" as const, title: "Szkliwo: jak działa", description: "Pierwszy akapit.\n\nDrugi akapit.", recap: "Szkliwo to szklista powłoka chroniąca ceramikę.", category: "Kuchnia" as const };
 
 describe("loadPublicItem", () => {
   beforeEach(clearItems);

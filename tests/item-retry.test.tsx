@@ -37,7 +37,7 @@ describe("POST /items/[id]/retry", () => {
     await retry(id);
 
     await waitUntilSummarized();
-    expect(await getItem(id)).toMatchObject({ status: "done", attempts: 2, title: SAMPLE_REPLY.title, category: "IT" });
+    expect(await getItem(id)).toMatchObject({ status: "done", attempts: 2, title: SAMPLE_REPLY.title, category: "AI/IT" });
   });
 
   it("leaves the Item Failed with the new error when the source still cannot be read", async () => {

@@ -12,7 +12,7 @@ import { allItems, clearItems, getItem, insertLinkItem } from "./items";
 import { formRequest, sessionCookiesFor } from "./session";
 
 const OWNER = process.env.OWNER_EMAIL!;
-const DONE = { status: "done" as const, title: "Glazura popiołowa", description: "Pierwszy akapit.\n\nDrugi akapit.", recap: "Krótko.", category: "Ceramika" as const };
+const DONE = { status: "done" as const, title: "Glazura popiołowa", description: "Pierwszy akapit.\n\nDrugi akapit.", recap: "Krótko.", category: "Kuchnia" as const };
 const JPEG = new Uint8Array([0xff, 0xd8, 0xff, 0xd9]);
 
 async function insertUpload(path: string, mimeType: "image/jpeg" | "video/mp4", bytes = JPEG) {
@@ -48,7 +48,7 @@ describe("ItemDetail", () => {
     expect(html).toContain('<a class="link-card" href="https://example.com/glazura"');
     expect(html.indexOf("W jednym zdaniu")).toBeLessThan(html.indexOf("Streszczenie"));
     expect(html.indexOf("Streszczenie")).toBeLessThan(html.indexOf("<h3>Źródło</h3>"));
-    expect(html).toContain('<option value="Ceramika" selected="">Ceramika</option>');
+    expect(html).toContain('<option value="Kuchnia" selected="">Kuchnia</option>');
     expect(html).toContain("22 września 2026 12:00");
     expect(html).not.toContain("<img");
   });
@@ -115,31 +115,31 @@ describe("POST /items/[id]/category", () => {
   it("stores the Owner's Category, returns to the Item page, which then shows the new value", async () => {
     const id = await insertLinkItem("https://example.com/a", DONE);
 
-    const res = await postForm(postCategory, `/items/${id}/category`, { category: "Jedzenie" });
+    const res = await postForm(postCategory, `/items/${id}/category`, { category: "Sport" });
 
     expect(res.status).toBe(303);
     expect(res.headers.get("location")).toBe(`${process.env.PANEL_URL}/items/${id}`);
     const item = (await loadItem(id))!;
-    expect(item.category).toBe("Jedzenie");
+    expect(item.category).toBe("Sport");
     const html = renderToStaticMarkup(<ItemDetail item={item} media={null} />);
-    expect(html).toContain('<option value="Jedzenie" selected="">Jedzenie</option>');
-    expect(html).not.toContain('<option value="Ceramika" selected="">');
+    expect(html).toContain('<option value="Sport" selected="">Sport</option>');
+    expect(html).not.toContain('<option value="Kuchnia" selected="">');
   });
 
   it("refuses a form posted from another site", async () => {
     const id = await insertLinkItem("https://example.com/a", DONE);
-    const request = formRequest(`/items/${id}/category`, { category: "AI" }, await sessionCookiesFor(OWNER));
+    const request = formRequest(`/items/${id}/category`, { category: "AI/IT" }, await sessionCookiesFor(OWNER));
     request.headers.set("origin", "https://evil.example");
 
     const res = await postCategory(request, { params: Promise.resolve({ id }) });
 
     expect(res.status).toBe(403);
-    expect((await getItem(id)).category).toBe("Ceramika");
+    expect((await getItem(id)).category).toBe("Kuchnia");
   });
 
   it("accepts a form posted from the Panel itself", async () => {
     const id = await insertLinkItem("https://example.com/a", DONE);
-    const request = formRequest(`/items/${id}/category`, { category: "AI" }, await sessionCookiesFor(OWNER));
+    const request = formRequest(`/items/${id}/category`, { category: "AI/IT" }, await sessionCookiesFor(OWNER));
     request.headers.set("origin", new URL(process.env.PANEL_URL!).origin);
 
     expect((await postCategory(request, { params: Promise.resolve({ id }) })).status).toBe(303);
@@ -148,22 +148,22 @@ describe("POST /items/[id]/category", () => {
   it("refuses a Category outside the list", async () => {
     const id = await insertLinkItem("https://example.com/a", DONE);
 
-    const res = await postForm(postCategory, `/items/${id}/category`, { category: "Sport" });
+    const res = await postForm(postCategory, `/items/${id}/category`, { category: "Ogrodnictwo" });
 
     expect(res.status).toBe(400);
-    expect((await getItem(id)).category).toBe("Ceramika");
+    expect((await getItem(id)).category).toBe("Kuchnia");
   });
 
   it("refuses anyone but the Owner", async () => {
     const id = await insertLinkItem("https://example.com/a", DONE);
 
-    expect((await postForm(postCategory, `/items/${id}/category`, { category: "AI" }, Promise.resolve([]))).status).toBe(401);
-    expect((await postForm(postCategory, `/items/${id}/category`, { category: "AI" }, sessionCookiesFor("stranger@example.com"))).status).toBe(401);
-    expect((await getItem(id)).category).toBe("Ceramika");
+    expect((await postForm(postCategory, `/items/${id}/category`, { category: "AI/IT" }, Promise.resolve([]))).status).toBe(401);
+    expect((await postForm(postCategory, `/items/${id}/category`, { category: "AI/IT" }, sessionCookiesFor("stranger@example.com"))).status).toBe(401);
+    expect((await getItem(id)).category).toBe("Kuchnia");
   });
 
   it("answers 404 for an Item that does not exist", async () => {
-    const res = await postForm(postCategory, "/items/00000000-0000-0000-0000-00000000dead/category", { category: "AI" });
+    const res = await postForm(postCategory, "/items/00000000-0000-0000-0000-00000000dead/category", { category: "AI/IT" });
     expect(res.status).toBe(404);
   });
 });

@@ -7,9 +7,9 @@ describe("toCategory", () => {
   });
 
   it.each([
-    ["an unknown label", "Sport"],
+    ["an unknown label", "Ogrodnictwo"],
     ["a different case", "ai"],
-    ["surrounding whitespace is not enough to rescue an unknown label", " Sport "],
+    ["surrounding whitespace is not enough to rescue an unknown label", " Ogrodnictwo "],
     ["a non-string", 42],
     ["null", null],
     ["undefined", undefined],

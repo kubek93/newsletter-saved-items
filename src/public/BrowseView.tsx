@@ -2,8 +2,7 @@ import Link from "next/link";
 import { CATEGORIES_ALPHABETICAL } from "@/domain/category";
 import { formatDigestDay } from "@/domain/digest-day";
 import { CATEGORY_ICONS, SOURCE_ICONS } from "@/domain/icons";
-import { SOURCES } from "@/domain/item";
-import { SOURCE_LABELS } from "@/panel/labels";
+import { SOURCE_LABELS, SOURCES_BY_LABEL } from "@/panel/labels";
 import { applyFilters, countBy, groupByDigestDay, readingMinutes, type BrowseFilters, type PublicItem } from "./browse";
 
 function href(filters: BrowseFilters): string {
@@ -97,7 +96,7 @@ export function Browse({ items, filters }: { items: PublicItem[]; filters: Brows
         />
         <FilterList
           title="Źródła"
-          values={SOURCES}
+          values={SOURCES_BY_LABEL}
           counts={countBy(applyFilters(items, { category: filters.category }), (item) => item.source)}
           selected={filters.source}
           label={(source) => `${SOURCE_ICONS[source]} ${SOURCE_LABELS[source]}`}

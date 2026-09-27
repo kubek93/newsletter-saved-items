@@ -31,7 +31,7 @@ describe("summarizeItem", () => {
       title: SAMPLE_REPLY.title,
       description: SAMPLE_REPLY.description,
       recap: SAMPLE_REPLY.recap,
-      category: "IT",
+      category: "AI/IT",
       error: null,
     });
 
@@ -41,7 +41,7 @@ describe("summarizeItem", () => {
     const userContent = request.messages.find((m) => m.role === "user")!.content;
     expect(JSON.stringify(userContent)).toContain("just setting up my twttr");
     expect(JSON.stringify(userContent)).toContain("@jack");
-    expect(JSON.stringify(request.response_format)).toContain("Pomysły na produkty");
+    expect(JSON.stringify(request.response_format)).toContain("Elektronika");
   });
 
   it("sends the post's photos to the model", async () => {
