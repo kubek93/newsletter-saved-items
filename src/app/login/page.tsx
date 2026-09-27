@@ -1,6 +1,6 @@
 const MESSAGES: Record<string, string> = {
-  refused: "To konto Google nie ma dostępu do Panelu.",
-  error: "Logowanie się nie powiodło. Spróbuj jeszcze raz.",
+  refused: "To konto nie ma dostępu do Panelu.",
+  error: "Nieprawidłowy e-mail lub hasło.",
 };
 
 export default async function LoginPage({
@@ -13,10 +13,18 @@ export default async function LoginPage({
   return (
     <main className="login">
       <h1>Zapisane</h1>
-      <p>Panel właściciela. Zaloguj się kontem Google, które ma dostęp.</p>
+      <p>Panel właściciela.</p>
       {message && <p className="notice">{message}</p>}
-      <form method="post" action="/auth/login">
-        <button type="submit">Zaloguj przez Google</button>
+      <form method="post" action="/auth/login" className="login-form">
+        <label>
+          E-mail
+          <input type="email" name="email" required autoComplete="username" />
+        </label>
+        <label>
+          Hasło
+          <input type="password" name="password" required autoComplete="current-password" />
+        </label>
+        <button type="submit">Zaloguj</button>
       </form>
     </main>
   );

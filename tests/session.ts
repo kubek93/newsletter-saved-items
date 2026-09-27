@@ -34,6 +34,20 @@ export async function sessionCookiesFor(email: string): Promise<Cookie[]> {
   return cookies.filter((cookie) => cookie.value !== "");
 }
 
+/** An Auth account for `email` that signs in with `password` (created, or the password set on the existing one). */
+export async function withPassword(email: string, password: string): Promise<void> {
+  const created = await supabaseAdmin.auth.admin.createUser({ email, password, email_confirm: true });
+  if (!created.error) return;
+  if (!/already/i.test(created.error.message)) throw created.error;
+
+  const { data, error } = await supabaseAdmin.auth.admin.listUsers({ perPage: 1000 });
+  if (error) throw error;
+  const existing = data.users.find((user) => user.email === email);
+  if (!existing) throw new Error(`No Auth account for ${email}`);
+  const updated = await supabaseAdmin.auth.admin.updateUserById(existing.id, { password });
+  if (updated.error) throw updated.error;
+}
+
 /** A request to the Panel as a browser with these cookies would make it. */
 export function panelRequest(path: string, cookies: Cookie[] = [], init?: ConstructorParameters<typeof NextRequest>[1]): NextRequest {
   const request = new NextRequest(new URL(path, "http://localhost:3000"), init);
