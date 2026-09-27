@@ -7,8 +7,8 @@ import { clearItems, insertLinkItem } from "./items";
 const DONE = { status: "done" as const, description: "Opis.", recap: "Skrót." };
 
 async function seed() {
-  await insertLinkItem("https://x.com/a/status/1", { ...DONE, title: "Model językowy", category: "AI", saved_at: "2026-09-20T10:00:00Z", digest_day: "2026-09-20" });
-  await insertLinkItem("https://example.com/glazura", { ...DONE, title: "Glazura popiołowa", category: "Ceramika", saved_at: "2026-09-22T10:00:00Z", digest_day: "2026-09-22" });
+  await insertLinkItem("https://x.com/a/status/1", { ...DONE, title: "Model językowy", category: "AI/IT", saved_at: "2026-09-20T10:00:00Z", digest_day: "2026-09-20" });
+  await insertLinkItem("https://example.com/glazura", { ...DONE, title: "Glazura popiołowa", category: "Kuchnia", saved_at: "2026-09-22T10:00:00Z", digest_day: "2026-09-22" });
   await insertLinkItem("https://www.instagram.com/p/abc/", { saved_at: "2026-09-25T20:00:00Z", digest_day: "2026-09-25" });
   await insertLinkItem("https://example.com/paywall", { status: "failed", attempts: 3, error: "Page returned 403", saved_at: "2026-09-26T01:00:00Z", digest_day: "2026-09-25" });
 }
@@ -30,7 +30,7 @@ describe("listItems", () => {
   });
 
   it("narrows to a Category", async () => {
-    const items = await listItems({ category: "Ceramika" });
+    const items = await listItems({ category: "Kuchnia" });
     expect(items.map((item) => item.title)).toEqual(["Glazura popiołowa"]);
   });
 
@@ -63,7 +63,7 @@ describe("ItemList", () => {
     expect(html).toContain("<th>Tytuł</th><th>Źródło</th><th>Stan</th><th>Kategoria</th><th>Zapisano</th>");
     expect(html).toContain("<td>Instagram</td><td>Czeka na podsumowanie</td><td>–</td>");
     expect(html).toContain("<td>Web</td><td>Nie odczytano</td>");
-    expect(html).toContain("<td>X</td><td>Gotowe</td><td>AI</td>");
+    expect(html).toContain("<td>X</td><td>Gotowe</td><td>AI/IT</td>");
     expect(html).toContain('<time dateTime="2026-09-20T10:00:00+00:00">20 wrz 2026, 12:00</time>');
   });
 
@@ -74,12 +74,12 @@ describe("ItemList", () => {
   });
 
   it("reflects the filters in the form so the URL and the form agree", async () => {
-    const filters = { category: "Ceramika" as const, from: "2026-09-01", to: "2026-09-30" };
+    const filters = { category: "Kuchnia" as const, from: "2026-09-01", to: "2026-09-30" };
     const html = renderToStaticMarkup(<ItemList items={await listItems(filters)} filters={filters} />);
 
     expect(html).toMatch(/<form[^>]*method="get"/);
     expect(html).toMatch(/<form[^>]*action="\/panel"/);
-    expect(html).toContain('<option value="Ceramika" selected="">Ceramika</option>');
+    expect(html).toContain('<option value="Kuchnia" selected="">Kuchnia</option>');
     expect(html).toContain('name="from" value="2026-09-01"');
     expect(html).toContain('name="to" value="2026-09-30"');
     expect(html).toContain("Glazura popiołowa");
@@ -87,7 +87,7 @@ describe("ItemList", () => {
   });
 
   it("says so when nothing matches", () => {
-    const html = renderToStaticMarkup(<ItemList items={[]} filters={{ category: "Siłownia" }} />);
+    const html = renderToStaticMarkup(<ItemList items={[]} filters={{ category: "Sport" }} />);
     expect(html).toContain("Nic tu nie ma.");
     expect(html).not.toContain("<table");
   });

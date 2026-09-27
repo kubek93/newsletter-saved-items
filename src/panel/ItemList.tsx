@@ -1,9 +1,8 @@
 import Link from "next/link";
 import { CATEGORIES_ALPHABETICAL } from "@/domain/category";
-import { SOURCES } from "@/domain/item";
 import type { Item } from "@/domain/item";
 import type { ItemFilters } from "./items";
-import { itemLabel, SOURCE_LABELS, STATUS_LABELS } from "./labels";
+import { itemLabel, SOURCE_LABELS, STATUS_LABELS, SOURCES_BY_LABEL } from "./labels";
 
 const dateFormat = new Intl.DateTimeFormat("pl-PL", {
   timeZone: "Europe/Warsaw",
@@ -33,7 +32,7 @@ export function ItemList({ items, filters }: { items: Item[]; filters: ItemFilte
           Źródło
           <select name="source" defaultValue={filters.source ?? ""}>
             <option value="">Wszystkie</option>
-            {SOURCES.map((source) => (
+            {SOURCES_BY_LABEL.map((source) => (
               <option key={source} value={source}>
                 {SOURCE_LABELS[source]}
               </option>

@@ -3,14 +3,11 @@ import type { Source } from "./item";
 
 /** One glyph per Category and per Source, shown next to their names everywhere people browse. */
 export const CATEGORY_ICONS: Record<Category, string> = {
-  AI: "🤖",
-  IT: "💻",
-  "Pomysły na produkty": "💡",
-  Produkty: "🛒",
-  Ceramika: "🏺",
+  "AI/IT": "🤖",
+  Elektronika: "🔌",
   Zdrowie: "🩺",
-  Siłownia: "🏋️",
-  Jedzenie: "🍜",
+  Sport: "🏋️",
+  Kuchnia: "🍜",
   Polityka: "🏛️",
   Finanse: "💰",
   Memy: "😂",

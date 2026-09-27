@@ -49,7 +49,7 @@ async function sentTo(digestDay: string): Promise<string[]> {
 
 // 07:00 Europe/Warsaw on 26 September 2026 (CEST): the Digest Day that ended at 03:00 is 25 September.
 const MORNING = new Date("2026-09-26T05:00:10Z");
-const DONE = { status: "done" as const, title: "Tytuł", description: "Opis.", recap: "Skrót.", category: "IT" as const };
+const DONE = { status: "done" as const, title: "Tytuł", description: "Opis.", recap: "Skrót.", category: "AI/IT" as const };
 
 describe("sendDigest", () => {
   beforeEach(async () => {

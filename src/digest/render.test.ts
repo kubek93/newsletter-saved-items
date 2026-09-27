@@ -17,7 +17,7 @@ function item(overrides: Partial<Item>): Item {
     title: "Tytuł",
     description: "Opis.",
     recap: "Skrót.",
-    category: "IT",
+    category: "AI/IT",
     saved_at: "2026-09-25T10:00:00Z",
     digest_day: "2026-09-25",
     error: null,
@@ -31,14 +31,14 @@ describe("renderDigest", () => {
       "2026-09-25",
       [
         item({ id: "1", category: "Inne", title: "Coś innego" }),
-        item({ id: "2", category: "AI", title: "Model" }),
-        item({ id: "3", category: "Ceramika", title: "Glazura" }),
-        item({ id: "4", category: "AI", title: "Agent" }),
+        item({ id: "2", category: "AI/IT", title: "Model" }),
+        item({ id: "3", category: "Kuchnia", title: "Glazura" }),
+        item({ id: "4", category: "AI/IT", title: "Agent" }),
       ],
       PANEL,
     );
 
-    const order = ["<h2>AI</h2>", "Model", "Agent", "<h2>Ceramika</h2>", "Glazura", "<h2>Inne</h2>", "Coś innego"].map((s) =>
+    const order = ["<h2>AI/IT</h2>", "Model", "Agent", "<h2>Kuchnia</h2>", "Glazura", "<h2>Inne</h2>", "Coś innego"].map((s) =>
       html.indexOf(s),
     );
     expect(order.every((position) => position >= 0)).toBe(true);

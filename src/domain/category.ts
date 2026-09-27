@@ -1,13 +1,10 @@
 /** The closed Category list. Domain vocabulary, not configuration: see CONTEXT.md. */
 export const CATEGORIES = [
-  "AI",
-  "IT",
-  "Pomysły na produkty",
-  "Produkty",
-  "Ceramika",
+  "AI/IT",
+  "Elektronika",
   "Zdrowie",
-  "Siłownia",
-  "Jedzenie",
+  "Sport",
+  "Kuchnia",
   "Polityka",
   "Finanse",
   "Memy",

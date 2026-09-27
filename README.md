@@ -47,7 +47,7 @@ Accepted types: JPEG, PNG, WebP, MP4, QuickTime; the Shortcut converts HEIC to J
 
 ## Public page
 
-`/` is open to everyone: every Item that has a Summary, as tiles (title, the one-sentence recap, Source and Category with their icons, reading time) in sections per Digest Day, newest first, with Category and Source filters that show counts (`/?category=Ceramika&source=web`; folded behind a "Filtry" label on phones). A tile opens `/p/<id>`: the sentence, the summary, the source embedded (X and Instagram widgets, YouTube player, the file itself for an Upload, a link card otherwise) and a large "Otwórz" button. Items still Pending or Failed never appear there.
+`/` is open to everyone: every Item that has a Summary, as tiles (title, the one-sentence recap, Source and Category with their icons, reading time) in sections per Digest Day, newest first, with Category and Source filters that show counts (`/?category=Kuchnia&source=web`; folded behind a "Filtry" label on phones). A tile opens `/p/<id>`: the sentence, the summary, the source embedded (X and Instagram widgets, YouTube player, the file itself for an Upload, a link card otherwise) and a large "Otwórz" button. Items still Pending or Failed never appear there.
 
 ## Panel
 
@@ -65,7 +65,7 @@ s.auth.admin.createUser({ email: process.env.OWNER_EMAIL, password: process.argv
 
 Google sign-in is prepared (`POST /auth/google` and `/auth/callback`) but not linked from the page until the provider is enabled: in the Supabase dashboard, Authentication → Providers → Google, with a Google Cloud OAuth client whose authorised redirect URI is `https://<project-ref>.supabase.co/auth/v1/callback`, and `PANEL_URL/auth/callback` in the allowed redirect URLs. `SUPABASE_ANON_KEY` comes from `supabase status -o env` locally.
 
-The Item list is filtered by Category and by Digest Day range (the day an Item belongs to in the Digest, 03:00 to 03:00) through the query string (`/?category=Ceramika&from=2026-09-01&to=2026-09-30`).
+The Item list is filtered by Category and by Digest Day range (the day an Item belongs to in the Digest, 03:00 to 03:00) through the query string (`/?category=Kuchnia&from=2026-09-01&to=2026-09-30`).
 
 ## Cron jobs
 
@@ -75,6 +75,36 @@ Declared in `vercel.json`, invoked by Vercel Cron with `CRON_SECRET` as a bearer
 - `/api/cron/digest`, 07:00 Europe/Warsaw: sends the Digest for the Digest Day that ended at 03:00 to every Recipient through Resend (`RESEND_API_KEY`, sender in `DIGEST_FROM`, links to Uploads built from `PANEL_URL`). Every email is recorded in `digest_sends` before it is handed to Resend and the day is marked sent in `digests` once all Recipients have theirs, so neither a doubled invocation nor a retry after a partial failure sends anyone a Digest Day twice. Recipients are managed on the Panel's `/recipients` page (add, remove); the Digest goes to whoever is on the list at send time.
 
 Run one locally: `curl -H "Authorization: Bearer $CRON_SECRET" http://localhost:3000/api/cron/retry` (outside the Warsaw hour it answers `{"skipped":true}`).
+
+## External services
+
+| Service | Used for | Plan | What one Item costs |
+|---|---|---|---|
+| [Vercel](https://vercel.com) | hosting, the two cron jobs | Pro team, $20 a month per seat (shared with other projects) | nothing extra |
+| [Supabase](https://supabase.com) | Postgres, Auth, Storage for Uploads | Pro, $25 a month (shared) | nothing extra below the included storage |
+| [OpenRouter](https://openrouter.ai) → Gemini 2.5 Flash | the Summary (text, images, video, YouTube by URL, pinned to Google AI Studio) | pay per token: $0.30 per million input, $2.50 per million output | see below |
+| [FxTwitter](https://github.com/FxEmbed/FxEmbed) | X posts: text, photos, video variants | free public API | nothing |
+| [Apify](https://apify.com) `apify/instagram-scraper` | Instagram posts and Reels | pay per result: $2.30 per 1 000 ($2.70 on the Free plan) | about $0.0025 |
+| [Firecrawl](https://firecrawl.dev) | web pages as Markdown (also Facebook, Allegro, Amazon) | Free: 1 000 credits a month; Hobby $19 for 5 000 | 1 credit a page: nothing on Free, about $0.004 on Hobby |
+| [Resend](https://resend.com) | the Digest email | Free: 3 000 emails a month | nothing |
+| Apple Shortcuts | sharing from the phone | free | nothing |
+
+Prices as listed by the providers on 2026-09-27; check them before relying on the numbers.
+
+**The cost of one Item** is almost entirely the model: the instructions are about 400 tokens, the answer about 400 tokens ($0.001), and the content adds what the table says. Gemini counts about 258 tokens per image, about 263 tokens per second of video and 32 per second of audio.
+
+| Kind of Item | Tokens in | Estimate |
+|---|---|---|
+| X post, text or photo | under 1 000 | $0.001 |
+| Web page (6 000 tokens of Markdown) | 6 000 | $0.003, plus $0.004 on Firecrawl Hobby |
+| Instagram photo | under 1 000 | $0.001, plus $0.0025 on Apify |
+| Instagram Reel, 30 s | 9 000 | $0.004, plus $0.0025 on Apify |
+| X video, 3 min (the variant that fits) | 50 000 | $0.016 |
+| Uploaded photo | under 1 000 | $0.001 |
+| Uploaded video, 1 min | 18 000 | $0.006 |
+| YouTube video, 10 min | 180 000 | $0.055 |
+
+So a typical Item costs a fraction of a cent to about two cents, and a ten-minute YouTube video about five cents. Twenty Items a day come to a few dollars a month on top of the fixed plans.
 
 ## Tests
 

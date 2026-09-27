@@ -86,7 +86,7 @@ export const SAMPLE_REPLY = {
   title: "Pierwszy tweet w historii",
   description: "Jack Dorsey ogłasza uruchomienie swojego konta na Twitterze krótkim wpisem „just setting up my twttr”.",
   recap: "Historyczny, pierwszy wpis na Twitterze.",
-  category: "IT",
+  category: "AI/IT",
 };
 
 /** OpenRouter answers chat completions with the given reply, in the OpenAI-compatible shape. */
