@@ -90,9 +90,16 @@ export function ItemDetail({ item, media }: { item: Item; media: Media | null })
       )}
       {item.status === "pending" && <p className="notice">Podsumowanie jeszcze powstaje.</p>}
 
-      <form method="post" action={`/items/${item.id}/delete`} className="danger">
-        <button type="submit">Usuń</button>
-      </form>
+      <div className="actions">
+        <form method="post" action={`/items/${item.id}/retry`} className="inline">
+          <button type="submit" disabled={item.status === "pending"}>
+            Podsumuj ponownie
+          </button>
+        </form>
+        <form method="post" action={`/items/${item.id}/delete`} className="inline danger">
+          <button type="submit">Usuń</button>
+        </form>
+      </div>
     </article>
   );
 }

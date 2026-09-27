@@ -53,6 +53,15 @@ export async function changeCategory(id: string, category: Category): Promise<bo
   return data.length === 1;
 }
 
+/**
+ * Puts the Item back to Pending so the Summary can be written again on the Owner's request.
+ * A done Item is otherwise never re-summarised, and the daily retry stops after three attempts.
+ */
+export async function reopenItem(id: string): Promise<void> {
+  const { error } = await supabaseAdmin.from("items").update({ status: "pending", error: null }).eq("id", id);
+  if (error) throw error;
+}
+
 /** Removes the Item for good, together with its file when it is an Upload. */
 export async function deleteItem(item: Item): Promise<void> {
   if (item.source === "upload" && item.storage_path) {

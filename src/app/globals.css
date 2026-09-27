@@ -188,7 +188,9 @@ p.failed code {
   color: #b3261e;
 }
 
-form.danger {
+.actions {
+  display: flex;
+  gap: 12px;
   border-top: 1px solid var(--line);
   padding-top: 16px;
 }

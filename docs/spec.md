@@ -53,8 +53,8 @@ AI, IT, Pomysły na produkty, Ceramika, Zdrowie, Siłownia, Jedzenie, Polityka, 
 - Next.js app on Vercel. Supabase provides Postgres, Auth and Storage; no Supabase Edge Functions. (ADR 0001)
 - Login: Google OAuth, allowlist containing only the Owner's email. Anyone else is refused. Recipients never log in.
 - UI in Polish.
-- v1 features: list of Items filterable by Category and date; Item detail with Summary and media preview; change Category; delete Item; add and remove Recipients.
-- Deliberately not in v1: editing a Summary, re-running analysis manually, full-text search, Digest preview, thumbnails in the Digest, X bookmark polling, TikTok or LinkedIn special handling, more than one Owner.
+- v1 features: list of Items filterable by Category and date; Item detail with Summary and media preview; change Category; delete Item; write the Summary again on request (any state, ignoring the attempt limit); add and remove Recipients.
+- Deliberately not in v1: editing a Summary, full-text search, Digest preview, thumbnails in the Digest, X bookmark polling, TikTok or LinkedIn special handling, more than one Owner.
 
 ## External services
 
