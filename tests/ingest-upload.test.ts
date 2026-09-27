@@ -53,6 +53,17 @@ describe("file upload through signed URLs", () => {
     expect(uploadUrl).toContain("token=");
   });
 
+  it("refuses to register an empty file", async () => {
+    const { uploadUrl, path } = await (await call(requestUploadUrl, { filename: "empty.jpg", mimeType: "image/jpeg" })).json();
+    expect((await fetch(uploadUrl, { method: "PUT", body: new Blob([], { type: "image/jpeg" }) })).status).toBe(200);
+
+    const res = await call(registerUpload, { path });
+
+    expect(res.status).toBe(400);
+    expect(await res.json()).toEqual({ error: "empty file" });
+    expect(await allItems()).toHaveLength(0);
+  });
+
   it("refuses to register a path nothing was uploaded to", async () => {
     const res = await call(registerUpload, { path: "2026/09/nothing-here.jpg" });
     expect(res.status).toBe(400);
