@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { CATEGORIES_ALPHABETICAL } from "@/domain/category";
-import type { Source } from "@/domain/item";
+import { SOURCES } from "@/domain/item";
 import type { Item } from "@/domain/item";
 import type { ItemFilters } from "./items";
 import { itemLabel, SOURCE_LABELS, STATUS_LABELS } from "./labels";
@@ -33,7 +33,7 @@ export function ItemList({ items, filters }: { items: Item[]; filters: ItemFilte
           Źródło
           <select name="source" defaultValue={filters.source ?? ""}>
             <option value="">Wszystkie</option>
-            {(Object.keys(SOURCE_LABELS) as Source[]).map((source) => (
+            {SOURCES.map((source) => (
               <option key={source} value={source}>
                 {SOURCE_LABELS[source]}
               </option>

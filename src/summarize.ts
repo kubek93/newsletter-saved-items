@@ -4,12 +4,16 @@ import { supabaseAdmin } from "@/lib/supabase";
 import { readInstagram } from "@/readers/instagram";
 import type { Reader } from "@/readers/types";
 import { readUpload } from "@/readers/upload";
-import { readWeb } from "@/readers/web";
+import { readWeb, readYouTubeSource } from "@/readers/web";
 import { readX } from "@/readers/x";
 
 const READERS: Record<Source, Reader> = {
   x: readX,
   instagram: readInstagram,
+  youtube: readYouTubeSource,
+  facebook: readWeb,
+  allegro: readWeb,
+  amazon: readWeb,
   web: readWeb,
   upload: readUpload,
 };
