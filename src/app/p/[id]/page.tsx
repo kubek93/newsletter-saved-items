@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { accessOf, supabaseForPage } from "@/panel/auth";
 import { loadPublicItem } from "@/public/browse";
 import { embedFor } from "@/public/embed";
 import { PublicItemView } from "@/public/PublicItemView";
@@ -9,9 +10,10 @@ export default async function PublicItemPage({ params }: { params: Promise<{ id:
   const loaded = await loadPublicItem(id);
   if (!loaded) notFound();
   const { item, media } = loaded;
+  const owner = (await accessOf(await supabaseForPage())).access === "owner";
   return (
     <main className="public">
-      <PublicItemView item={item} embed={embedFor(item, media)} openUrl={item.url ?? media?.[0]?.url ?? null} />
+      <PublicItemView item={item} embed={embedFor(item, media)} openUrl={item.url ?? media?.[0]?.url ?? null} owner={owner} />
     </main>
   );
 }

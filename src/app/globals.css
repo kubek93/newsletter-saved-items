@@ -329,7 +329,17 @@ form.danger button {
 
 /* Public Item page */
 .public-item .back {
-  margin: 0 0 8px;
+  margin: 0 0 12px;
+}
+
+.button-back {
+  display: inline-block;
+  padding: 8px 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  font-weight: 600;
+  text-decoration: none;
+  color: var(--fg);
 }
 
 .public-item header h1 {
@@ -423,8 +433,38 @@ form.danger button {
   font-size: 0.85rem;
 }
 
-.open {
+.open-row {
+  display: flex;
+  align-items: stretch;
+  gap: 10px;
   margin: 24px 0 0;
+}
+
+.open-row .button-large {
+  flex: 1;
+}
+
+.button-small {
+  display: inline-flex;
+  align-items: center;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--bg);
+  color: var(--fg);
+  font: inherit;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.open-row form {
+  display: flex;
+}
+
+.button-small.danger {
+  color: #b3261e;
 }
 
 .button-large {
