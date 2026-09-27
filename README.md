@@ -47,9 +47,19 @@ Accepted types: JPEG, PNG, WebP, MP4, QuickTime; the Shortcut converts HEIC to J
 
 ## Panel
 
-Server-rendered pages at `/`, behind Google sign-in through Supabase Auth. Only the account in `OWNER_EMAIL` gets in; any other Google account is signed out again with a message. `src/proxy.ts` refreshes the session cookies on every request and sends anonymous visitors to `/login`; each page then checks the allowlist with `requireOwner()`. Data is read with the service role after that check, so no RLS policies are needed for the Panel.
+Server-rendered pages at `/`, behind Supabase Auth. Sign-in is email and password (`POST /auth/login`); only the account in `OWNER_EMAIL` gets in, any other account is signed out again with a message. `src/proxy.ts` refreshes the session cookies on every request and sends anonymous visitors to `/login`; each page then checks the allowlist with `requireOwner()`. Data is read with the service role after that check, so no RLS policies are needed for the Panel.
 
-Google provider setup (once, in the Supabase dashboard): Authentication → Providers → Google, with a Google Cloud OAuth client whose authorised redirect URI is `https://<project-ref>.supabase.co/auth/v1/callback`. Add `PANEL_URL/auth/callback` to the allowed redirect URLs. Locally the same is done in `supabase/config.toml` (`[auth.external.google]`) with `SUPABASE_AUTH_GOOGLE_CLIENT_ID` and `SUPABASE_AUTH_GOOGLE_SECRET`; `SUPABASE_ANON_KEY` comes from `supabase status -o env`.
+The Owner's account is created once through the Auth admin API (no public sign-up; turn "Allow new users to sign up" off in the Supabase dashboard). Locally:
+
+```
+node -e '
+const { createClient } = require("@supabase/supabase-js");
+const s = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
+s.auth.admin.createUser({ email: process.env.OWNER_EMAIL, password: process.argv[1], email_confirm: true }).then(console.log);
+' 'a-strong-password'
+```
+
+Google sign-in is prepared (`POST /auth/google` and `/auth/callback`) but not linked from the page until the provider is enabled: in the Supabase dashboard, Authentication → Providers → Google, with a Google Cloud OAuth client whose authorised redirect URI is `https://<project-ref>.supabase.co/auth/v1/callback`, and `PANEL_URL/auth/callback` in the allowed redirect URLs. `SUPABASE_ANON_KEY` comes from `supabase status -o env` locally.
 
 The Item list is filtered by Category and by Digest Day range (the day an Item belongs to in the Digest, 03:00 to 03:00) through the query string (`/?category=Ceramika&from=2026-09-01&to=2026-09-30`).
 

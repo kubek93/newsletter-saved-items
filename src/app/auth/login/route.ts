@@ -1,15 +1,21 @@
 import type { NextRequest } from "next/server";
-import { env } from "@/lib/env";
-import { supabaseForRoute } from "@/panel/auth";
+import { accessOf, supabaseForRoute } from "@/panel/auth";
 import { loginPath } from "@/panel/owner";
 
-/** Starts the Google sign-in: Supabase builds the provider URL, the browser is sent there. */
+/** Email and password sign-in. The account must exist in Supabase Auth and be the Owner. */
 export async function POST(request: NextRequest) {
   const { supabase, redirectTo } = supabaseForRoute(request);
-  const { data, error } = await supabase.auth.signInWithOAuth({
-    provider: "google",
-    options: { redirectTo: `${env.panelUrl}/auth/callback` },
-  });
-  if (error || !data.url) return redirectTo(loginPath("error"));
-  return redirectTo(data.url);
+  const form = await request.formData();
+  const email = String(form.get("email") ?? "").trim();
+  const password = String(form.get("password") ?? "");
+  if (!email || !password) return redirectTo(loginPath("error"));
+
+  const { error } = await supabase.auth.signInWithPassword({ email, password });
+  if (error) return redirectTo(loginPath("error"));
+
+  if ((await accessOf(supabase)).access !== "owner") {
+    await supabase.auth.signOut();
+    return redirectTo(loginPath("refused"));
+  }
+  return redirectTo("/");
 }

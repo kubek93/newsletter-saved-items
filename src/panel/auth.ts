@@ -41,7 +41,13 @@ export function supabaseForRoute(request: NextRequest) {
   const jar: CookieToSet[] = [];
   const supabase = createServerClient(env.supabaseUrl, env.supabaseAnonKey, {
     cookies: {
-      getAll: () => request.cookies.getAll(),
+      // What the browser sent, overlaid with what Auth set during this request, so a sign-out right
+      // after a sign-in sees the session it has to clear.
+      getAll: () => {
+        const merged = new Map(request.cookies.getAll().map(({ name, value }) => [name, { name, value }]));
+        for (const { name, value } of jar) merged.set(name, { name, value });
+        return [...merged.values()];
+      },
       setAll: (toSet) => {
         jar.push(...toSet);
       },
