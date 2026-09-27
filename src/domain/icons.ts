@@ -13,6 +13,7 @@ export const CATEGORY_ICONS: Record<Category, string> = {
   Jedzenie: "🍜",
   Polityka: "🏛️",
   Finanse: "💰",
+  Memy: "😂",
   Inne: "📌",
 };
 

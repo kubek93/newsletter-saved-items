@@ -21,7 +21,7 @@ The state of an Item from the moment it is saved until its Summary exists. A Pen
 _Avoid_: processing, queued, in progress, oczekujący
 
 **Category**:
-One label from a closed list defined by the Owner: AI, IT, Pomysły na produkty, Produkty, Ceramika, Zdrowie, Siłownia, Jedzenie, Polityka, Finanse, Inne. "Inne" is the catch-all for anything that fits none of the others. The AI assigns it to an Item; the Owner may change it in the Panel. An Item has exactly one Category.
+One label from a closed list defined by the Owner: AI, IT, Pomysły na produkty, Produkty, Ceramika, Zdrowie, Siłownia, Jedzenie, Polityka, Finanse, Memy, Inne. "Inne" is the catch-all for anything that fits none of the others. The AI assigns it to an Item; the Owner may change it in the Panel. An Item has exactly one Category.
 _Avoid_: tag, label, topic, group, temat
 
 **Digest**:

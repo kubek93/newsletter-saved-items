@@ -10,6 +10,7 @@ export const CATEGORIES = [
   "Jedzenie",
   "Polityka",
   "Finanse",
+  "Memy",
   "Inne",
 ] as const;
 

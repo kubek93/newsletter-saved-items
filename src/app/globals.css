@@ -176,13 +176,7 @@ form.inline {
   margin: 0 0 16px;
 }
 
-.summary {
-  margin-bottom: 24px;
-}
 
-.recap {
-  color: var(--muted);
-}
 
 p.failed code {
   color: #b3261e;
@@ -367,7 +361,8 @@ form.danger button {
   border-top: 1px solid var(--line);
 }
 
-.block h2 {
+.block h2,
+.block h3 {
   font-size: 0.8rem;
   text-transform: uppercase;
   letter-spacing: 0.04em;
