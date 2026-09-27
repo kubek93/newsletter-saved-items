@@ -292,3 +292,141 @@ form.danger button {
   margin: 6px 0 0;
   font-size: 0.95rem;
 }
+
+/* Filters fold on a phone (checkbox toggle, no JavaScript) */
+.filters-toggle {
+  display: none;
+}
+
+.filters-label {
+  display: none;
+  cursor: pointer;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+@media (max-width: 720px) {
+  .filters-label {
+    display: block;
+  }
+
+  .filters-panel {
+    display: none;
+  }
+
+  .filters-toggle:checked ~ .filters-panel {
+    display: block;
+  }
+}
+
+.tile .tagline {
+  margin: 0 0 6px;
+  font-size: 0.92rem;
+  color: var(--fg);
+  opacity: 0.85;
+}
+
+.tile .meta span + span::before {
+  content: " · ";
+}
+
+/* Public Item page */
+.public-item .back {
+  margin: 0 0 8px;
+}
+
+.public-item header h1 {
+  font-size: 1.6rem;
+  line-height: 1.3;
+  margin: 8px 0 16px;
+}
+
+.badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+}
+
+.badge {
+  font-size: 0.85rem;
+  padding: 3px 10px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+}
+
+.badge.muted {
+  color: var(--muted);
+}
+
+.block {
+  padding: 16px 0;
+  border-top: 1px solid var(--line);
+}
+
+.block h2 {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  margin: 0 0 8px;
+}
+
+.lead {
+  font-size: 1.15rem;
+  margin: 0;
+}
+
+.embed.video {
+  position: relative;
+  padding-top: 56.25%;
+}
+
+.embed.video iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  border-radius: 8px;
+}
+
+.link-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  text-decoration: none;
+  overflow-wrap: anywhere;
+}
+
+.link-card .host {
+  font-weight: 600;
+  color: var(--fg);
+}
+
+.link-card .url {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.open {
+  margin: 24px 0 0;
+}
+
+.button-large {
+  display: block;
+  text-align: center;
+  padding: 14px 20px;
+  border-radius: 10px;
+  background: var(--accent);
+  color: #fff;
+  font-weight: 600;
+  font-size: 1.05rem;
+  text-decoration: none;
+}

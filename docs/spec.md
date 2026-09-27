@@ -43,7 +43,7 @@ AI, IT, Pomysły na produkty, Ceramika, Zdrowie, Siłownia, Jedzenie, Polityka, 
 
 - Sent at 07:00 Europe/Warsaw by a Vercel Cron job (Vercel Pro, minute precision).
 - Covers the Digest Day that ended at 03:00 the same morning (03:00 to 03:00), by the time the Item was saved in the system.
-- Plain HTML, no images: a heading per Category, then each Item's title, Summary and link. Link rule: an Item with a URL links to the original; an Upload links to its page in the Panel.
+- Plain HTML, no images: a heading per Category, then each Item's title, Summary and link. Link rule: an Item with a URL links to the original; an Upload links to its public page.
 - Failed Items, and Items still Pending at send time, are listed with their link and a note that they could not be read.
 - Sent even when the Digest Day had no Items, as an empty Digest.
 - Identical content for every Recipient. Sent through Resend. Sender domain: the Owner's own domain, address to be provided.

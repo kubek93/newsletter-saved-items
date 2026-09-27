@@ -56,7 +56,7 @@ describe("renderDigest", () => {
 
   it.each([
     ["a link Item points at the original", item({ url: "https://x.com/a/status/1" }), "https://x.com/a/status/1"],
-    ["an Upload points at its Panel page", item({ id: "abc", source: "upload", url: null, storage_path: "2026/09/x.jpg" }), `${PANEL}/items/abc`],
+    ["an Upload points at its public page", item({ id: "abc", source: "upload", url: null, storage_path: "2026/09/x.jpg" }), `${PANEL}/p/abc`],
   ])("%s", (_name, saved, expected) => {
     expect(linkFor(saved, PANEL)).toBe(expected);
   });
@@ -73,7 +73,7 @@ describe("renderDigest", () => {
 
     expect(html).toContain("<h2>Nie udało się odczytać</h2>");
     expect(html).toContain('<a href="https://example.com/paywall">https://example.com/paywall</a> (nie udało się odczytać)');
-    expect(html).toContain(`<a href="${PANEL}/items/p">Plik z urządzenia</a> (nie udało się odczytać)`);
+    expect(html).toContain(`<a href="${PANEL}/p/p">Plik z urządzenia</a> (nie udało się odczytać)`);
   });
 
   it("renders an empty Digest that says so", () => {
