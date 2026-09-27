@@ -63,6 +63,14 @@ describe("PublicItemView", () => {
     expect([...order].sort((a, b) => a - b)).toEqual(order);
   });
 
+  it("renders the description's paragraphs and bullet lists", async () => {
+    const item = (await loadPublicItem(await insertLinkItem("https://example.com/lista", { ...DONE, description: "Wstęp.\n\n- Krok pierwszy\n- Krok drugi\n\nZakończenie\nw dwóch liniach." })))!.item;
+
+    const html = renderToStaticMarkup(<PublicItemView item={item} embed={embedFor(item)} openUrl={item.url} />);
+
+    expect(html).toContain("<h2>Opis</h2><p>Wstęp.</p><ul><li>Krok pierwszy</li><li>Krok drugi</li></ul><p>Zakończenie w dwóch liniach.</p>");
+  });
+
   it("embeds an X post and an Instagram post with the platforms' widgets", async () => {
     const x = (await loadPublicItem(await insertLinkItem("https://x.com/jack/status/20", DONE)))!.item;
     const ig = (await loadPublicItem(await insertLinkItem("https://www.instagram.com/reel/abc/", DONE)))!.item;

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { applyFilters, countBy, groupByDigestDay, parseBrowseFilters, readingMinutes, type PublicItem } from "./browse";
+import { applyFilters, countBy, groupByDigestDay, parseBrowseFilters, type PublicItem } from "./browse";
 
 function item(overrides: Partial<PublicItem>): PublicItem {
   return {
@@ -15,17 +15,6 @@ function item(overrides: Partial<PublicItem>): PublicItem {
     ...overrides,
   };
 }
-
-describe("readingMinutes", () => {
-  it.each([
-    ["an empty Summary still takes a minute", { description: "", recap: "" }, 1],
-    ["a few words", { description: "Krótki opis w kilku słowach.", recap: "Skrót." }, 1],
-    ["about 400 words take two minutes", { description: Array(380).fill("słowo").join(" "), recap: Array(20).fill("x").join(" ") }, 2],
-    ["about 1000 words take five minutes", { description: Array(1000).fill("słowo").join(" "), recap: "" }, 5],
-  ])("%s", (_name, summary, expected) => {
-    expect(readingMinutes(summary)).toBe(expected);
-  });
-});
 
 describe("groupByDigestDay", () => {
   it("makes one section per consecutive Digest Day, keeping order", () => {

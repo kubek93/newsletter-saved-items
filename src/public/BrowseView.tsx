@@ -3,7 +3,7 @@ import { CATEGORIES_ALPHABETICAL } from "@/domain/category";
 import { formatDigestDay } from "@/domain/digest-day";
 import { CATEGORY_ICONS, SOURCE_ICONS } from "@/domain/icons";
 import { SOURCE_LABELS, SOURCES_BY_LABEL } from "@/panel/labels";
-import { applyFilters, countBy, groupByDigestDay, readingMinutes, type BrowseFilters, type PublicItem } from "./browse";
+import { applyFilters, countBy, groupByDigestDay, type BrowseFilters, type PublicItem } from "./browse";
 
 function href(filters: BrowseFilters): string {
   const query = new URLSearchParams();
@@ -66,7 +66,6 @@ function Tile({ item }: { item: PublicItem }) {
           <span>
             {CATEGORY_ICONS[category]} {category}
           </span>
-          <span>{readingMinutes(item)} min czytania</span>
         </p>
       </Link>
     </article>

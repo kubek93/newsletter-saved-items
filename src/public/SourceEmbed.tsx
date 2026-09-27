@@ -1,13 +1,27 @@
 import type { Embed } from "./embed";
 import { PlatformEmbed } from "./PlatformEmbed";
 
-/** The summary's paragraphs, split on blank lines. */
+/** The description's blocks, split on blank lines: a paragraph, or a bullet list when every line starts with "- ". */
 export function Paragraphs({ text }: { text: string }) {
   return (
     <>
-      {text.split(/\n{2,}/).map((paragraph, index) => (
-        <p key={index}>{paragraph}</p>
-      ))}
+      {text
+        .split(/\n{2,}/)
+        .map((block) => block.trim())
+        .filter(Boolean)
+        .map((block, index) => {
+          const lines = block.split("\n");
+          if (lines.every((line) => /^[-•] /.test(line))) {
+            return (
+              <ul key={index}>
+                {lines.map((line, item) => (
+                  <li key={item}>{line.slice(2)}</li>
+                ))}
+              </ul>
+            );
+          }
+          return <p key={index}>{lines.join(" ")}</p>;
+        })}
     </>
   );
 }

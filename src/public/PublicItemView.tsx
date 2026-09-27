@@ -2,7 +2,6 @@ import Link from "next/link";
 import { CATEGORY_ICONS, SOURCE_ICONS } from "@/domain/icons";
 import { SOURCE_LABELS } from "@/panel/labels";
 import type { PublicItem } from "./browse";
-import { readingMinutes } from "./browse";
 import type { Embed } from "./embed";
 import { Paragraphs, SourceEmbed } from "./SourceEmbed";
 
@@ -22,7 +21,6 @@ export function PublicItemView({ item, embed, openUrl }: { item: PublicItem; emb
           <span className="badge">
             {CATEGORY_ICONS[category]} {category}
           </span>
-          <span className="badge muted">{readingMinutes(item)} min czytania</span>
         </p>
         <h1>{item.title}</h1>
       </header>

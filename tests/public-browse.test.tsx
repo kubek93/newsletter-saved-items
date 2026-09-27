@@ -38,13 +38,13 @@ describe("Browse", () => {
     await seed();
   });
 
-  it("shows tiles in sections per Digest Day with title, grey Source and reading time", async () => {
+  it("shows tiles in sections per Digest Day with title, Source and Category", async () => {
     const html = renderToStaticMarkup(<Browse items={await listPublicItems()} filters={{}} />);
 
     const order = ["26 WRZEŚNIA 2026", "Model językowy", "25 WRZEŚNIA 2026", "Glazura popiołowa", "Reel o mobilności", "24 WRZEŚNIA 2026", "Kubek z pieca"].map((s) => html.indexOf(s));
     expect(order.every((p) => p >= 0)).toBe(true);
     expect([...order].sort((a, b) => a - b)).toEqual(order);
-    expect(html).toContain('<span>𝕏 X</span><span>🤖 AI/IT</span><span>1 min czytania</span>');
+    expect(html).toContain('<span>𝕏 X</span><span>🤖 AI/IT</span></p>');
     expect(html).toContain('<span>📁 Plik</span><span>🍜 Kuchnia</span>');
     expect(html).toContain('<p class="tagline">Krótko o tym.</p>');
     expect(html).toMatch(/<a href="\/p\/[0-9a-f-]{36}"><h3>Glazura popiołowa<\/h3>/);

@@ -11,7 +11,7 @@ const INSTRUCTIONS = `Dostajesz treść zapisanego materiału: post z X, post z 
 Odpowiadasz wyłącznie po polsku, w formacie JSON z polami:
 - "title": chwytliwy tytuł (do 80 znaków), który jednocześnie mówi, czym ten materiał jest (np. "Ramen w 30 minut: przepis z Instagrama krok po kroku").
 - "recap": dokładnie jedno zdanie wyjaśniające, czego materiał dotyczy i co z niego wynika; będzie widoczne pod tytułem na liście.
-- "description": opis o długości dopasowanej do złożoności materiału: jeden krótki akapit dla prostego posta lub zdjęcia, kilka akapitów dla artykułu czy dłuższego wideo. Ma pozwolić zrozumieć dokładnie, o czym to jest, z konkretami (nazwy, liczby, wnioski), bez lania wody. Dla kategorii "Memy" wystarczy jedno lub dwa zdania: o co chodzi w żarcie.
+- "description": opis, po którym wiadomo dokładnie, o czym to jest, z konkretami (nazwy, liczby, wnioski), bez lania wody. Długość wynika z materiału, nie z jego rodzaju: prosty post, zdjęcie lub mem to jeden krótki akapit (mem: jedno lub dwa zdania o tym, o co chodzi w żarcie); artykuł lub dłuższe wideo dostaje tyle akapitów, ile ma odrębnych wątków, zwykle dwa do czterech po trzy do pięciu zdań; krótki artykuł zostaje krótki. Nigdy nie wydłużaj na siłę. Formatowanie: akapity oddzielaj pustą linią; gdy materiał ma naturalną listę (kroki, punkty, składniki, porównywane opcje), zapisz ją jako wypunktowanie, każdy punkt w osobnej linii zaczynającej się od "- ". Jeden długi akapit jest trudny do czytania, więc dziel według myśli. Bez nagłówków, pogrubień i innego markdownu.
 - "category": dokładnie jedna z: ${CATEGORIES.map((c) => `"${c}"`).join(", ")}. "Inne" tylko, gdy nic innego nie pasuje.
 
 Nie dopisuj niczego poza JSON-em.`;

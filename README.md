@@ -49,7 +49,7 @@ Accepted types: JPEG, PNG, WebP, MP4, QuickTime; the Shortcut converts HEIC to J
 
 ## Public page
 
-`/` is open to everyone: every Item that has a Summary, as tiles (title, the one-sentence recap, Source and Category with their icons, reading time) in sections per Digest Day, newest first, with Category and Source filters that show counts (`/?category=Kuchnia&source=web`; folded behind a "Filtry" label on phones). A tile opens `/p/<id>`: the sentence, the summary, the source embedded (X and Instagram widgets, YouTube player, the file itself for an Upload, a link card otherwise) and a large "Otwórz" button. Items still Pending or Failed never appear there.
+`/` is open to everyone: every Item that has a Summary, as tiles (title, the one-sentence recap, Source and Category with their icons) in sections per Digest Day, newest first, with Category and Source filters that show counts (`/?category=Kuchnia&source=web`; folded behind a "Filtry" label on phones). A tile opens `/p/<id>`: the sentence, the summary, the source embedded (X and Instagram widgets, YouTube player, the file itself for an Upload, a link card otherwise) and a large "Otwórz" button. Items still Pending or Failed never appear there.
 
 ## Panel
 
